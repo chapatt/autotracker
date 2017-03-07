@@ -13,6 +13,8 @@ class Rotor
   PIN_A4988_DIR =	18
   PIN_A4988_RESET =	27
 
+  MOTOR_STEPS = 400
+
   def initialize
     RPi::GPIO.set_numbering :bcm
 
@@ -33,6 +35,8 @@ class Rotor
 
     # not-reset
     RPi::GPIO.setup PIN_A4988_RESET, :as => :output, :initialize => :high
+
+    self.reset
   end
 
   def set_resolution(resolution)
@@ -65,5 +69,29 @@ class Rotor
     else
       return false
     end
+  end
+
+  def to_bearing(bearing)
+  end
+
+  def to_relative_bearing(bearing)
+    if !bearing.between?(0, 360)
+      return false
+    end
+    to_position(MOTOR_STEPS * bearing / 360)
+  end
+
+  def to_position(position)
+    step((position % MOTOR_STEPS) - @position)
+  end
+
+  def step(steps)
+    # actually step here
+    puts "Taking #{steps} steps!"
+    @position += steps
+  end
+
+  def reset
+    @position = 0
   end
 end
