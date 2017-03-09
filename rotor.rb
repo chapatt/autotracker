@@ -17,7 +17,7 @@ class Rotor
   PIN_A4988_DIR =	18
   PIN_A4988_RESET =	27
 
-  PIN_MAX_SENSOR =	22
+  PIN_POSITIVE_SENSOR =	22
 
   def initialize
     @units_angle = :deg
@@ -25,15 +25,18 @@ class Rotor
     @motor_steps = 400
     @motor_max_resolution = 16
 
-    # FIXME! check that positions is within range on assignment
-    @min_sensor_position = 0
-    @max_sensor_position = 399
+    # FIXME! check that positions are within range on assignment
+    # position at which the negative sensor is closed
+    @negative_sensor_position = 0
+    # position at which the postive sensor is closed
+    @positive_sensor_position = -5
+    # position at which to rotate after finding a limit sensor
     @reset_position = 0
 
     # FIXME! check that range is possible on assignment
     # Clockwise, relative to vessel's forward direction
-    @min_rad = -2.25 * Math::PI
-    @max_rad = 2.25 * Math::PI
+    @min_rad = -1.25 * Math::PI
+    @max_rad = 1.25 * Math::PI
 
     unless $simulate
     RPi::GPIO.set_numbering :bcm
@@ -59,7 +62,8 @@ class Rotor
     RPi::GPIO.setup PIN_MAX_SENSOR, :as => :input
     end # simulate
 
-    #self.reset
+    @position = 0
+    self.reset
   end
 
   def range
@@ -121,6 +125,7 @@ class Rotor
       return false
     end
 
+    # FIXME! this is wrong
     if !self.range.include?(position % @motor_steps)
       # given position cannot be reached
       return false
@@ -132,6 +137,11 @@ class Rotor
   def step(resolution, steps)
     self.set_resolution(resolution)
     # actually step here
+    if steps < 0
+      steps.times {step_backward}
+    else
+      steps.times {step_forward}
+    end
     puts "Taking #{steps} steps!"
     @position += steps
   end
@@ -154,7 +164,7 @@ class Rotor
     end # simulate
   end
 
-  def step_forward_until_block_istrue
+  def step_forward_until
     until yield
       step_forward
       puts "One small step..."
@@ -164,15 +174,55 @@ class Rotor
   end
 
   def reset
-    self.step_forward_until {max_sensor?}
-    @position = 0
+    if self.negative_sensor? or !self.positive_sensor?
+      self.step_forward_until {self.positive_sensor?}
+      self.step(:full, -@positive_sensor_position + @reset_position)
+    else
+      self.step_backward_until {self.negative_sensor?}
+      self.step(:full, -@negative_sensor_position + @reset_position)
+    end
+    @position = @reset_position
   end
 
-  def max_sensor?
-    if RPi::GPIO.high? PIN_NUM
+  def positive_sensor?
+    if $simulate
+    if @times.nil?
+      @times = 0
+    end
+    if @times < 15
+      @times += 1
+      return false
+    else
+      @times = 0
+      return true
+    end
+    else # simulate
+    if RPi::GPIO.high? PIN_POSITIVE_SENSOR
       return true
     else
       return false
     end
+    end # simulate
+  end
+
+  def negative_sensor?
+    if $simulate
+    if @times.nil?
+      @times = 0
+    end
+    if @times < 15
+      @times += 1
+      return false
+    else
+      @times = 0
+      return true
+    end
+    else # simulate
+    if RPi::GPIO.high? PIN_NEGATIVE_SENSOR
+      return true
+    else
+      return false
+    end
+    end # simulate
   end
 end
