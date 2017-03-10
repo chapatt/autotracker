@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+  <script>
+    var ws = new WebSocket("ws://localhost:2345");
+    ws.onopen = function(event)
+    {
+      ws.send("Can you hear me?"); 
+    };
+    ws.onmessage = function(event)
+    {
+      console.log(event.data);
+      rotor_to_bearing(event.data);
+    }
+  </script>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="500"
+    height="500"
+    version="1.1"
+  >
+    <circle
+      style="fill: none; stroke: #0000ff; stroke-width: 10"
+      cx="250"
+      cy="250"
+      r="200"
+    />
+    <!-- 70 * tan(60deg.) = 121.243557 -->
+    <path
+      id="arrow"
+      d="m 215,180 v 140 h 70 v -140 h 35 l -70,-121.243557 l -70,121.243557"
+    />
+    <rect
+      id="negative_sensor"
+      style="fill: #ff0000"
+      x="240"
+      y="35"
+      width="20"
+      height="30"
+    />
+    <rect
+      id="positive_sensor"
+      style="fill: #00ff00"
+      x="240"
+      y="35"
+      width="20"
+      height="30"
+    />
+  </svg>
+  <script>
+    function rotor_to_bearing(bearing)
+    {
+      document.getElementById("arrow").setAttribute("transform", "rotate(" + bearing + " 250 250)");
+    }
+
+    function negative_sensor_to_bearing(bearing)
+    {
+      document.getElementById("negative_sensor").setAttribute("transform", "rotate(" + bearing + " 250 250)");
+    }
+
+    function positive_sensor_to_bearing(bearing)
+    {
+      document.getElementById("positive_sensor").setAttribute("transform", "rotate(" + bearing + " 250 250)");
+    }
+  </script>
+  <br />
+  <button onclick="rotor_to_bearing(0)">Click to rotate to 0 deg.</button>
+  <br />
+  <button onclick="rotor_to_bearing(90)">Click to rotate to 90 deg.</button>
+  <br />
+  <button onclick="rotor_to_bearing(180)">Click to rotate to 180 deg.</button>
+  <br />
+  <button onclick="rotor_to_bearing(270)">Click to rotate to 270 deg.</button>
+  <br />
+  <br />
+  <button onclick="negative_sensor_to_bearing(0)">Click to set negative sensor to 0 deg.</button>
+  <br />
+  <button onclick="negative_sensor_to_bearing(90)">Click to set negative sensor to 90 deg.</button>
+  <br />
+  <button onclick="negative_sensor_to_bearing(180)">Click to set negative sensor to 180 deg.</button>
+  <br />
+  <button onclick="negative_sensor_to_bearing(270)">Click to set negative sensor to 270 deg.</button>
+  <br />
+  <br />
+  <button onclick="positive_sensor_to_bearing(0)">Click to set positive sensor to 0 deg.</button>
+  <br />
+  <button onclick="positive_sensor_to_bearing(90)">Click to set positive sensor to 90 deg.</button>
+  <br />
+  <button onclick="positive_sensor_to_bearing(180)">Click to set positive sensor to 180 deg.</button>
+  <br />
+  <button onclick="positive_sensor_to_bearing(270)">Click to set positive sensor to 270 deg.</button>
+</body>
+</html>
