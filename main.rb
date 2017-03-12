@@ -26,7 +26,13 @@ t1 = Thread.new do
         puts "Client disconnected"
       end
 
-      EM::PeriodicTimer.new 0.5 {ws.send Angle.convert(Simulator.instance.position, Rotor.instance.motor_steps, 2 * Math::PI).to_f}
+      last = 0
+      EM::PeriodicTimer.new 0.5 do
+        if (last != (current = Angle.convert(Simulator.instance.position, Rotor.instance.motor_steps, 2 * Math::PI).to_f))
+          ws.send current
+          last = current
+        end
+      end
     end
   end
 end
@@ -41,7 +47,9 @@ t2 = Thread.new do
 
     EM::PeriodicTimer.new 5 do
       Rotor.instance.to_relative_bearing(Geo.get_heading_to_station - Geo.get_current_heading)
-      puts Rotor.instance.position
+      puts "intended heading: #{Geo.get_heading_to_station - Geo.get_current_heading}"
+      puts "step queue #{Rotor.instance.step_queue}"
+      puts "current position: #{Rotor.instance.position}"
     end
 
     EM::PeriodicTimer.new 5 do

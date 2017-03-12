@@ -234,8 +234,9 @@ class Rotor
   end
 
   def to_position(position)
+    puts "You're telling me to go to #{position}?!"
     if (position % Rational(1, @motor_max_resolution)) != 0
-      # given position cannot be precisely reached
+      puts "the given position cannot be precisely reached"
       return false
     end
 
@@ -243,7 +244,7 @@ class Rotor
     negative_rad = Angle::coterminal(rad, 2 * Math::PI, -1, 1)
     positive_rad = Angle::coterminal(rad, 2 * Math::PI, 1, 1)
     unless self.range.include?(negative_rad) or self.range.include?(positive_rad)
-      # given position cannot be reached
+      puts "the given position cannot be reached"
       return false
     end
 
@@ -252,6 +253,6 @@ class Rotor
   end
 
   def to_relative_bearing(bearing)
-    to_position(Angle::convert(bearing, 360, @motor_steps))
+    to_position(Angle::convert(bearing, 360, @motor_steps).to_i)
   end
 end
