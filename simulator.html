@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <style type="text/css">
+    #rotor {
+      width: 500px;
+      height: 500px;
+    }
+
+    #arrow {
+      transform-origin: 250px 250px;
+    }
+
+    #negative_sensor {
+      transform-origin: 250px 250px;
+    }
+
+    #positive_sensor {
+      transform-origin: 250px 250px;
+    }
+  </style>
 </head>
 <body>
-  <script>
+  <script type="text/javascript">
     var ws = new WebSocket("ws://localhost:2345");
     ws.onopen = function(event)
     {
@@ -16,6 +34,7 @@
     }
   </script>
   <svg
+    id="rotor"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:svg="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -51,47 +70,47 @@
       height="30"
     />
   </svg>
-  <script>
+  <script type="text/javascript">
     function rotor_to_bearing(bearing)
     {
-      document.getElementById("arrow").setAttribute("transform", "rotate(" + bearing + " 250 250)");
+      document.getElementById("arrow").style.transform = "rotate(" + bearing + "rad)";
     }
 
     function negative_sensor_to_bearing(bearing)
     {
-      document.getElementById("negative_sensor").setAttribute("transform", "rotate(" + bearing + " 250 250)");
+      document.getElementById("negative_sensor").style.transform = "rotate(" + bearing + "rad)";
     }
 
     function positive_sensor_to_bearing(bearing)
     {
-      document.getElementById("positive_sensor").setAttribute("transform", "rotate(" + bearing + " 250 250)");
+      document.getElementById("positive_sensor").style.transform = "rotate(" + bearing + "rad)";
     }
   </script>
   <br />
-  <button onclick="rotor_to_bearing(0)">Click to rotate to 0 deg.</button>
+  <button onclick="rotor_to_bearing(0)">Click to rotate to 0 rad</button>
   <br />
-  <button onclick="rotor_to_bearing(90)">Click to rotate to 90 deg.</button>
+  <button onclick="rotor_to_bearing(Math.PI/2)">Click to rotate to PI/2 rad</button>
   <br />
-  <button onclick="rotor_to_bearing(180)">Click to rotate to 180 deg.</button>
+  <button onclick="rotor_to_bearing(Math.PI)">Click to rotate to PI rad</button>
   <br />
-  <button onclick="rotor_to_bearing(270)">Click to rotate to 270 deg.</button>
-  <br />
-  <br />
-  <button onclick="negative_sensor_to_bearing(0)">Click to set negative sensor to 0 deg.</button>
-  <br />
-  <button onclick="negative_sensor_to_bearing(90)">Click to set negative sensor to 90 deg.</button>
-  <br />
-  <button onclick="negative_sensor_to_bearing(180)">Click to set negative sensor to 180 deg.</button>
-  <br />
-  <button onclick="negative_sensor_to_bearing(270)">Click to set negative sensor to 270 deg.</button>
+  <button onclick="rotor_to_bearing(Math.PI * 3 / 2)">Click to rotate to 3PI/2 rad</button>
   <br />
   <br />
-  <button onclick="positive_sensor_to_bearing(0)">Click to set positive sensor to 0 deg.</button>
+  <button onclick="positive_sensor_to_bearing(0)">Click to set positive sensor to 0 rad</button>
   <br />
-  <button onclick="positive_sensor_to_bearing(90)">Click to set positive sensor to 90 deg.</button>
+  <button onclick="positive_sensor_to_bearing(Math.PI/2)">Click to set positive sensor to PI/2 rad</button>
   <br />
-  <button onclick="positive_sensor_to_bearing(180)">Click to set positive sensor to 180 deg.</button>
+  <button onclick="positive_sensor_to_bearing(Math.PI)">Click to set positive sensor to PI rad</button>
   <br />
-  <button onclick="positive_sensor_to_bearing(270)">Click to set positive sensor to 270 deg.</button>
+  <button onclick="positive_sensor_to_bearing(Math.PI * 3 / 2)">Click to set positive sensor to 3PI/2 rad</button>
+  <br />
+  <br />
+  <button onclick="negative_sensor_to_bearing(0)">Click to set negative sensor to 0 rad</button>
+  <br />
+  <button onclick="negative_sensor_to_bearing(Math.PI/2)">Click to set negative sensor to PI/2 rad</button>
+  <br />
+  <button onclick="negative_sensor_to_bearing(Math.PI)">Click to set negative sensor to PI rad</button>
+  <br />
+  <button onclick="negative_sensor_to_bearing(Math.PI * 3 / 2)">Click to set negative sensor to 3PI/2 rad</button>
 </body>
 </html>
