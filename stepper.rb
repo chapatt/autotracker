@@ -1,6 +1,6 @@
 unless $simulate
 require 'rpi_gpio'
-end # simulate
+end # unless $simulate
 require 'singleton'
 
 require_relative 'simulator.rb'
@@ -38,7 +38,7 @@ class Stepper
 
     # not-reset
     RPi::GPIO.setup PIN_A4988_RESET, :as => :output, :initialize => :high
-    end # simulate
+    end # unless $simulate
   end
 
   def set_resolution(resolution)
@@ -48,7 +48,7 @@ class Stepper
       RPi::GPIO.set_low PIN_A4988_MS1
       RPi::GPIO.set_low PIN_A4988_MS2
       RPi::GPIO.set_low PIN_A4988_MS3
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_ms1 = :low
       Simulator.instance.pin_ms2 = :low
       Simulator.instance.pin_ms3 = :low
@@ -58,7 +58,7 @@ class Stepper
       RPi::GPIO.set_high PIN_A4988_MS1
       RPi::GPIO.set_low PIN_A4988_MS2
       RPi::GPIO.set_low PIN_A4988_MS3
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_ms1 = :high
       Simulator.instance.pin_ms2 = :low
       Simulator.instance.pin_ms3 = :low
@@ -68,7 +68,7 @@ class Stepper
       RPi::GPIO.set_low PIN_A4988_MS1
       RPi::GPIO.set_high PIN_A4988_MS2
       RPi::GPIO.set_low PIN_A4988_MS3
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_ms1 = :low
       Simulator.instance.pin_ms2 = :high
       Simulator.instance.pin_ms3 = :low
@@ -78,7 +78,7 @@ class Stepper
       RPi::GPIO.set_high PIN_A4988_MS1
       RPi::GPIO.set_high PIN_A4988_MS2
       RPi::GPIO.set_low PIN_A4988_MS3
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_ms1 = :high
       Simulator.instance.pin_ms2 = :high
       Simulator.instance.pin_ms3 = :low
@@ -88,7 +88,7 @@ class Stepper
       RPi::GPIO.set_high PIN_A4988_MS1
       RPi::GPIO.set_high PIN_A4988_MS2
       RPi::GPIO.set_high PIN_A4988_MS3
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_ms1 = :high
       Simulator.instance.pin_ms2 = :high
       Simulator.instance.pin_ms3 = :high
@@ -102,12 +102,12 @@ class Stepper
     if state == :high
       unless $simulate
       RPi::GPIO.set_high PIN_A4988_DIR
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_dir = :high
     elsif state == :low
       unless $simulate
       RPi::GPIO.set_low PIN_A4988_DIR
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_dir = :low
     else
       return false
@@ -118,12 +118,12 @@ class Stepper
     if state == :high
       unless $simulate
       RPi::GPIO.set_high PIN_A4988_STEP
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_step = :high
     elsif state == :low
       unless $simulate
       RPi::GPIO.set_low PIN_A4988_STEP
-      end # simulate
+      end # unless $simulate
       Simulator.instance.pin_step = :low
     else
       return false

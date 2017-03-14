@@ -1,6 +1,6 @@
 unless $simulate
 require 'rpi_gpio'
-end # simulate
+end # unless $simulate
 require 'singleton'
 
 require_relative 'stepper.rb'
@@ -45,8 +45,9 @@ class Rotor
     RPi::GPIO.set_numbering :bcm
 
     RPi::GPIO.setup PIN_MAX_SENSOR, :as => :input
-    end # simulate
+    end # unless $simulate
 
+    # actual current position is @position - @step_queue
     @position = 0
     @step_queue = 0
     self.reset
@@ -186,13 +187,13 @@ class Rotor
       @times = 0
       return true
     end
-    else # simulate
+    else # if $simulate
     if RPi::GPIO.high? PIN_POSITIVE_SENSOR
       return true
     else
       return false
     end
-    end # simulate
+    end # unless $simulate
   end
 
   def negative_sensor?
@@ -207,13 +208,13 @@ class Rotor
       @times = 0
       return true
     end
-    else # simulate
+    else # unless $simulate
     if RPi::GPIO.high? PIN_NEGATIVE_SENSOR
       return true
     else
       return false
     end
-    end # simulate
+    end # unless $simulate
   end
 
   def reset
