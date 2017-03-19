@@ -54,11 +54,7 @@ class Rotor
   end
 
   def range
-    if (@max_rad - @min_rad >= 2 * Math::PI)
-      return (-Float::INFINITY..Float::INFINITY)
-    else
-      return (Angle::coterminal(@min_rad, 2 * Math::PI, @min_rad, 1)..Angle::coterminal(@max_rad, 2 * Math::PI, @max_rad, 1))
-    end
+    return (Angle::coterminal(@min_rad, 2 * Math::PI, @min_rad, 1)..Angle::coterminal(@max_rad, 2 * Math::PI, @max_rad, 1))
   end
 
   def throw
