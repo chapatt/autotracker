@@ -219,15 +219,13 @@ class Rotor
         return false
       end
       @position = @positive_sensor_position
-      self.step(1, -@positive_sensor_position + @reset_position)
     else
       if !self.step_backward_until {self.negative_sensor?}
         return false
       end
       @position = @negative_sensor_position
-      self.step(1, -@negative_sensor_position + @reset_position)
     end
-    @position = @reset_position
+    self.to_position(@reset_position)
   end
 
   def to_position(position)
