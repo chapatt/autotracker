@@ -38,8 +38,8 @@ class Rotor
 
     # FIXME! check that range is possible on assignment
     # Clockwise, relative to vessel's forward direction
-    @min_rad = -Math::PI
-    @max_rad = Math::PI
+    @min_rad = -Math::PI - 1
+    @max_rad = Math::PI + 1
 
     unless $simulate
     RPi::GPIO.set_numbering :bcm
@@ -232,21 +232,19 @@ class Rotor
 
   def to_position(position)
     puts "You're telling me to go to #{position}?!"
+
+    rad = Angle::convert(position, @motor_steps, Math::PI * 2)
+    unless self.range.include?(rad)
+      puts "the given position cannot be reached"
+      return false
+    end
+
     if (position % Rational(1, @motor_max_resolution)) != 0
       puts "the given position cannot be precisely reached"
       return false
     end
 
-    rad = Angle::convert(position, @motor_steps, Math::PI * 2)
-    negative_rad = Angle::coterminal(rad, 2 * Math::PI, -1, 1)
-    positive_rad = Angle::coterminal(rad, 2 * Math::PI, 1, 1)
-    unless self.range.include?(negative_rad) or self.range.include?(positive_rad)
-      puts "the given position cannot be reached"
-      return false
-    end
-
-    # FIXME! go to closest position
-    step(1, Angle::coterminal(position, @motor_steps, 1, 1) - @position)
+    step(1, position - @position)
   end
 
   def to_relative_bearing(bearing)
