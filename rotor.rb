@@ -81,39 +81,45 @@ class Rotor
     if self.step_queue > 0
       if self.step_queue >= 1
         resolution = 1
-      elsif self.step_queue >= 0.5
+      elsif self.step_queue >= Rational(1, 2)
         resolution = 2
-      elsif self.step_queue >= 0.25
+      elsif self.step_queue >= Rational(1, 4)
         resolution = 4
-      elsif self.step_queue >= 0.125
+      elsif self.step_queue >= Rational(1, 8)
         resolution = 8
-      elsif self.step_queue >= 0.0625
+      elsif self.step_queue >= Rational(1, 16)
         resolution = 16
       else
         puts "Too precise!"
         return false
       end
       Stepper.instance.set_resolution(resolution)
+      puts "Resolution: #{resolution}"
       self.step_forward
+      puts "Queue before step: #{self.step_queue}"
       self.step_queue -= Rational(1, resolution)
+      puts "Queue after step: #{self.step_queue}"
     elsif self.step_queue < 0
-      if self.step_queue <= 1
+      if self.step_queue <= -1
         resolution = 1
-      elsif self.step_queue <= 0.5
+      elsif self.step_queue <= -Rational(1, 2)
         resolution = 2
-      elsif self.step_queue <= 0.25
+      elsif self.step_queue <= -Rational(1, 4)
         resolution = 4
-      elsif self.step_queue <= 0.125
+      elsif self.step_queue <= -Rational(1, 8)
        resolution = 8
-      elsif self.step_queue <= 0.0625
+      elsif self.step_queue <= -Rational(1, 16)
         resolution = 16
       else
         puts "Too precise!"
         return false
       end
       Stepper.instance.set_resolution(resolution)
+      puts "Resolution: #{resolution}"
       self.step_backward
+      puts "Queue before step: #{self.step_queue}"
       self.step_queue += Rational(1, resolution)
+      puts "Queue after step: #{self.step_queue}"
     end
   end
 
