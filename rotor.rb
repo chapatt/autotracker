@@ -8,6 +8,9 @@ require_relative 'stepper.rb'
 require_relative 'core_extensions/numeric/angle.rb'
 Numeric.include CoreExtensions::Numeric::Angle
 
+require_relative 'core_extensions/numeric/steps.rb'
+Numeric.include CoreExtensions::Numeric::Steps
+
 class Rotor
   include Singleton
 
@@ -254,13 +257,35 @@ class Rotor
   end
 
   # TODO: Rotate smallest angle to reach bearing
-  # Convert bearing to radians coterminal in first turn
-  # Convert @position to radians coterminal in first turn
+  # Convert bearing to positive radians coterminal in first turn
+  # Convert @position to positive radians coterminal in first turn
   # Subtract position_prime from bearing_prime
-  # If the sum of @position and the difference is in range, call to_position
-  #  else if sum is greater than @max_rad, call to_position with sum - @motor_steps 
-  #  else if sum is less than @min_rad, call to_position with sum + @motor_steps 
+  # If the sum of position_rad and the difference is in range, call to_position with sum
+  #  else if sum is greater than @max_rad, call to_position with sum - 2PI
+  #  else if sum is less than @min_rad, call to_position with sum + 2PI
   def to_relative_bearing(bearing)
-    to_position(bearing.convert(360, @motor_steps).to_i)
+    position_rad = @position.convert(@motor_steps, 2 * Math::PI)
+    difference = bearing.coterminal(2 * Math::PI, 1, 1) - position_rad.coterminal(2 * Math::PI, 1, 1)
+    closest_position = position_rad + difference
+    if self.range.include? closest_position
+      go_to_position = closest_position.convert(2 * Math::PI, @motor_steps)
+      rounded = go_to_position.round_to_resolution(@motor_max_resolution)
+      to_position(rounded)
+    elsif (closest_position > @max_rad) \
+      and (self.range.include? (less = closest_position - (2 * Math::PI)))
+    then
+      go_to_position = less.convert(2 * Math::PI, @motor_steps)
+      rounded = go_to_position.round_to_resolution(@motor_max_resolution)
+      to_position(rounded)
+    elsif (closest_position < @min_rad) \
+      and (self.range.include? (more = closest_position + (2 * Math::PI)))
+    then
+      go_to_position = more.convert(2 * Math::PI, @motor_steps)
+      rounded = go_to_position.round_to_resolution(@motor_max_resolution)
+      to_position(rounded)
+    else
+      puts "the given bearing cannot be reached"
+      return false
+    end
   end
 end
