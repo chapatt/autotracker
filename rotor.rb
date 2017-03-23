@@ -4,7 +4,9 @@ end # unless $simulate
 require 'singleton'
 
 require_relative 'stepper.rb'
-require_relative 'angle.rb'
+
+require_relative 'core_extensions/numeric/angle.rb'
+Numeric.include CoreExtensions::Numeric::Angle
 
 class Rotor
   include Singleton
@@ -54,7 +56,7 @@ class Rotor
   end
 
   def range
-    return (Angle::coterminal(@min_rad, 2 * Math::PI, @min_rad, 1)..Angle::coterminal(@max_rad, 2 * Math::PI, @max_rad, 1))
+    return (@min_rad.coterminal(2 * Math::PI, @min_rad, 1)..@max_rad.coterminal(2 * Math::PI, @max_rad, 1))
   end
 
   def throw
@@ -135,17 +137,17 @@ class Rotor
 
   def step_backward_until
     steps = 0
-    until yield or (steps >= Angle::convert(self.throw, 2 * Math::PI, @motor_steps))
+    until yield or (steps >= self.throw.convert(2 * Math::PI, @motor_steps))
       steps += 1
       @step_queue -= 1
       self.flush_queue
     end
 
     if steps >= (self.throw / (2 * Math::PI)) * @motor_steps
-      # We've stepped the whole throw of the rotor,
-      # even if we started at one end of the range, we'd have reached the other
+      # We've stepped the whole throw of the rotor;
+      # even if we started at one end of the range, we'd have reached the other end
       puts "We're never gonna get there!"
-      @error << :sensor_failure
+      @error << :sensor_fault
       return false
     else
       puts "It's true!"
@@ -154,17 +156,17 @@ class Rotor
 
   def step_forward_until
     steps = 0
-    until yield or (steps >= Angle::convert(self.throw, 2 * Math::PI, @motor_steps))
+    until yield or (steps >= self.throw.convert(2 * Math::PI, @motor_steps))
       steps += 1
       @step_queue += 1
       self.flush_queue
     end
 
-    if steps >= Angle::convert(self.throw, 2 * Math::PI, @motor_steps)
+    if steps >= self.throw.convert(2 * Math::PI, @motor_steps)
       # We've stepped the whole throw of the rotor,
       # even if we started at one end of the range, we'd have reached the other
       puts "We're never gonna get there!"
-      @error << :sensor_failure
+      @error << :sensor_fault
       return false
     else
       puts "It's true!"
@@ -237,7 +239,7 @@ class Rotor
   def to_position(position)
     puts "You're telling me to go to #{position}?!"
 
-    rad = Angle::convert(position, @motor_steps, Math::PI * 2)
+    rad = position.convert(@motor_steps, Math::PI * 2)
     unless self.range.include?(rad)
       puts "the given position cannot be reached"
       return false
@@ -252,6 +254,6 @@ class Rotor
   end
 
   def to_relative_bearing(bearing)
-    to_position(Angle::convert(bearing, 360, @motor_steps).to_i)
+    to_position(bearing.convert(360, @motor_steps).to_i)
   end
 end

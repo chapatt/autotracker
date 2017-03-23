@@ -11,6 +11,9 @@ require_relative 'rotor.rb'
 require_relative 'simulator.rb'
 require_relative 'geo.rb'
 
+require_relative 'core_extensions/numeric/angle.rb'
+Numeric.include CoreExtensions::Numeric::Angle
+
 t1 = Thread.new do
   EM.run do
     WebSocket::EventMachine::Server.start(:host => "0.0.0.0", :port => 2345) do |ws|
@@ -28,7 +31,7 @@ t1 = Thread.new do
 
       last = 0
       EM::PeriodicTimer.new 0.5 do
-        if (last != (current = Angle::convert(Simulator.instance.position, Rotor.instance.motor_steps, 2 * Math::PI).to_f))
+        if (last != (current = Simulator.instance.position.convert(Rotor.instance.motor_steps, 2 * Math::PI).to_f))
           ws.send current
           last = current
         end
