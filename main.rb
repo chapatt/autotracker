@@ -49,8 +49,8 @@ t2 = Thread.new do
     end
 
     EM::PeriodicTimer.new 5 do
-      Rotor.instance.to_relative_bearing(Geo::get_heading_to_station - Geo::get_current_heading)
-      puts "intended heading: #{Geo::get_heading_to_station - Geo::get_current_heading}"
+      Rotor.instance.to_relative_bearing(Geo::get_bearing_to_station - Geo::get_current_heading)
+      puts "intended heading: #{Geo::get_bearing_to_station - Geo::get_current_heading}"
       puts "step queue #{Rotor.instance.step_queue}"
       puts "current position: #{Rotor.instance.position}"
     end
