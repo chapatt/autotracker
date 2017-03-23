@@ -184,7 +184,7 @@ class Rotor
     if @times.nil?
       @times = 0
     end
-    if @times < 15
+    if @times < 17
       @times += 1
       return false
     else
@@ -197,7 +197,7 @@ class Rotor
     else
       return false
     end
-    end # unless $simulate
+    end # if $simulate
   end
 
   def negative_sensor?
@@ -205,20 +205,20 @@ class Rotor
     if @times.nil?
       @times = 0
     end
-    if @times < 15
+    if @times < 17
       @times += 1
       return false
     else
       @times = 0
       return true
     end
-    else # unless $simulate
+    else # if $simulate
     if RPi::GPIO.high? PIN_NEGATIVE_SENSOR
       return true
     else
       return false
     end
-    end # unless $simulate
+    end # if $simulate
   end
 
   def reset
