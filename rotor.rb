@@ -56,7 +56,7 @@ class Rotor
   end
 
   def range
-    return (@min_rad.coterminal(2 * Math::PI, @min_rad, 1)..@max_rad.coterminal(2 * Math::PI, @max_rad, 1))
+    return (@min_rad..@max_rad)
   end
 
   def throw
@@ -253,6 +253,13 @@ class Rotor
     step(1, position - @position)
   end
 
+  # TODO: Rotate smallest angle to reach bearing
+  # Convert bearing to radians coterminal in first turn
+  # Convert @position to radians coterminal in first turn
+  # Subtract position_prime from bearing_prime
+  # If the sum of @position and the difference is in range, call to_position
+  #  else if sum is greater than @max_rad, call to_position with sum - @motor_steps 
+  #  else if sum is less than @min_rad, call to_position with sum + @motor_steps 
   def to_relative_bearing(bearing)
     to_position(bearing.convert(360, @motor_steps).to_i)
   end
