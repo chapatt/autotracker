@@ -35,9 +35,9 @@ class Rotor
 
     # FIXME! check that positions are within range on assignment
     # position at which the negative sensor is closed
-    @negative_sensor_position = -15
+    @negative_sensor_position = -Math::PI / 2
     # position at which the postive sensor is closed
-    @positive_sensor_position = 15
+    @positive_sensor_position = Math::PI / 2
     # position at which to rotate after finding a limit sensor
     @reset_position = 0
 
@@ -146,7 +146,7 @@ class Rotor
       self.flush_queue
     end
 
-    if steps >= (self.throw / (2 * Math::PI)) * @motor_steps
+    if steps >= self.throw.convert(2 * Math::PI, @motor_steps)
       # We've stepped the whole throw of the rotor;
       # even if we started at one end of the range, we'd have reached the other end
       puts "We're never gonna get there!"
@@ -187,7 +187,7 @@ class Rotor
     if @times.nil?
       @times = 0
     end
-    if @times < 17
+    if @times < @positive_sensor_position.abs.convert(2 * Math::PI, @motor_steps) + 2
       @times += 1
       return false
     else
@@ -208,7 +208,7 @@ class Rotor
     if @times.nil?
       @times = 0
     end
-    if @times < 17
+    if @times < @negative_sensor_position.abs.convert(2 * Math::PI, @motor_steps) + 2
       @times += 1
       return false
     else
@@ -229,12 +229,12 @@ class Rotor
       if !self.step_forward_until {self.positive_sensor?}
         return false
       end
-      @position = @positive_sensor_position
+      @position = @positive_sensor_position.convert(2 * Math::PI, @motor_steps).round_to_resolution(@motor_max_resolution)
     else
       if !self.step_backward_until {self.negative_sensor?}
         return false
       end
-      @position = @negative_sensor_position
+      @position = @negative_sensor_position.convert(2 * Math::PI, @motor_steps).round_to_resolution(@motor_max_resolution)
     end
     self.to_position(@reset_position)
   end
