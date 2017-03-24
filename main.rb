@@ -6,6 +6,7 @@ end # unless $simulate
 
 require 'eventmachine'
 require 'websocket-eventmachine-server'
+require 'json'
 
 require_relative 'rotor.rb'
 require_relative 'simulator.rb'
@@ -32,7 +33,7 @@ t1 = Thread.new do
       last = 0
       EM::PeriodicTimer.new 0.5 do
         if (last != (current = Simulator.instance.position.convert(Rotor.instance.motor_steps, 2 * Math::PI).to_f))
-          ws.send current
+          ws.send({:bearing => current}.to_json)
           last = current
         end
       end
