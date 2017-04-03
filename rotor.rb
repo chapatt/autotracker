@@ -30,7 +30,8 @@ class Rotor
 
     @step_pause = 0.1
 
-    @motor_steps = 400
+    # FIXME! rename @rotor_steps
+    @motor_steps = 200
     @motor_max_resolution = 16
 
     # FIXME! check that positions are within range on assignment
