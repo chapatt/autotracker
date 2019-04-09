@@ -25,13 +25,13 @@
 </head>
 <body>
   <script type="text/javascript">
-    var ws = new WebSocket("ws://localhost:2345");
+    var ws = new WebSocket("ws://" + window.location.hostname + ":2345");
     ws.onopen = function(event) {
       ws.send("Can you hear me?"); 
     };
     ws.onmessage = function(event) {
       console.log(event.data);
-      rotor_to_bearing(JSON.parse(event.data).bearing);
+      rotorToBearing(JSON.parse(event.data).bearing);
     };
   </script>
   <svg id="rotor"
