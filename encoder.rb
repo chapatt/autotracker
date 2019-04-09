@@ -7,8 +7,8 @@ class Encoder
   PIN_ENC = 21
   CYCLES_PER_REV = 360
 
-  attr_accessor :direction # Until initialized @position will not change
-  attr_reader :position
+  attr_accessor :direction, # Until initialized @position will not change
+                :position
 
   def initialize
     @callbacks = Hash.new
@@ -35,10 +35,6 @@ class Encoder
       end
       @callbacks[pulse] << block
     end
-  end
-
-  def reset_position
-    @position = 0
   end
 
   def stop_watching

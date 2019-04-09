@@ -3,9 +3,9 @@ require 'singleton'
 class Rotor
   include Singleton
 
-  attr_accessor :position
+  attr_accessor :rel_bearing
 
-  def to_position position
-    @position = position
+  def to_rel_bearing rel_bearing
+    @rel_bearing = rel_bearing
   end
 end
