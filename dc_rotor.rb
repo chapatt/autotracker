@@ -18,12 +18,16 @@ class DCRotor < Rotor
 
     if @encoder.position < position
       @encoder.direction = :clockwise
-      @encoder.call_at(position) { @motor.stop_cw }
+      @encoder.call_at(position) { @motor.stop_cw; false }
       @motor.start_cw
     elsif @encoder.position > position
       @encoder.direction = :counterclockwise
-      @encoder.call_at(position) { @motor.stop_ccw }
+      @encoder.call_at(position) { @motor.stop_ccw; false }
       @motor.start_ccw
     end
+  end
+
+  def position
+    @encoder.position
   end
 end

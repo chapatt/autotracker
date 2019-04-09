@@ -9,7 +9,7 @@
 
     #arrow {
       transform-origin: 250px 250px;
-      transition: transform 1s;
+      transition: transform 1.5s;
     }
 
     #negative-sensor {
@@ -26,12 +26,9 @@
 <body>
   <script type="text/javascript">
     var ws = new WebSocket("ws://" + window.location.hostname + ":2345");
-    ws.onopen = function(event) {
-      ws.send("Can you hear me?"); 
-    };
     ws.onmessage = function(event) {
       console.log(event.data);
-      rotorToBearing(JSON.parse(event.data).bearing);
+      rotorToBearing(event.data);
     };
   </script>
   <svg id="rotor"
@@ -69,43 +66,27 @@
     />
   </svg>
   <script type="text/javascript">
+    function sendBearing(bearing) {
+        ws.send(bearing); 
+    }
+
     function rotorToBearing(bearing) {
-        document.getElementById('arrow').style.transform = "rotate(" + bearing + "rad)";
+        document.getElementById('arrow').style.transform = "rotate(" + bearing + "deg)";
     }
 
     function negativeSensorToBearing(bearing) {
-        document.getElementById('negative-sensor').style.transform = "rotate(" + bearing + "rad)";
+        document.getElementById('negative-sensor').style.transform = "rotate(" + bearing + "deg)";
     }
 
     function positiveSensorToBearing(bearing) {
-        document.getElementById('positive-sensor').style.transform = "rotate(" + bearing + "rad)";
+        document.getElementById('positive-sensor').style.transform = "rotate(" + bearing + "deg)";
     }
   </script>
   <br />
-  <button onclick="rotorToBearing(0)">Click to rotate to 0 rad</button>
-  <br />
-  <button onclick="rotorToBearing(Math.PI/2)">Click to rotate to PI/2 rad</button>
-  <br />
-  <button onclick="rotorToBearing(Math.PI)">Click to rotate to PI rad</button>
-  <br />
-  <button onclick="rotorToBearing(Math.PI * 3 / 2)">Click to rotate to 3PI/2 rad</button>
-  <br />
-  <br />
-  <button onclick="positiveSensorToBearing(0)">Click to set positive sensor to 0 rad</button>
-  <br />
-  <button onclick="positiveSensorToBearing(Math.PI/2)">Click to set positive sensor to PI/2 rad</button>
-  <br />
-  <button onclick="positiveSensorToBearing(Math.PI)">Click to set positive sensor to PI rad</button>
-  <br />
-  <button onclick="positiveSensorToBearing(Math.PI * 3 / 2)">Click to set positive sensor to 3PI/2 rad</button>
-  <br />
-  <br />
-  <button onclick="negativeSensorToBearing(0)">Click to set negative sensor to 0 rad</button>
-  <br />
-  <button onclick="negativeSensorToBearing(Math.PI/2)">Click to set negative sensor to PI/2 rad</button>
-  <br />
-  <button onclick="negativeSensorToBearing(Math.PI)">Click to set negative sensor to PI rad</button>
-  <br />
-  <button onclick="negativeSensorToBearing(Math.PI * 3 / 2)">Click to set negative sensor to 3PI/2 rad</button>
+  <form onsubmit="sendBearing(document.getElementById('bearing').value); return false">
+    Bearing:<br />
+    <input type="text" id="bearing" autofocus="autofocus" autocomplete="off" /><br />
+    <input type="submit" value="Rotate" />
+  </form>
 </body>
 </html>
