@@ -13,6 +13,7 @@ class Encoder
   def initialize
     @callbacks = Hash.new
     @position = 0
+    @callback_mutex = Mutex.new
 
     GPIO::setup PIN_ENC, with_direction: GPIO::DIRECTION_INPUT
 
@@ -28,10 +29,12 @@ class Encoder
 
   # Block should return false to delete callback
   def call_at pulse, &block
-    if @callbacks[pulse].nil?
-      @callbacks[pulse] = Array.new
+    @callback_mutex.synchronize do
+      if @callbacks[pulse].nil?
+        @callbacks[pulse] = Array.new
+      end
+      @callbacks[pulse] << block
     end
-    @callbacks[pulse] << block
   end
 
   def reset_position
@@ -58,10 +61,12 @@ class Encoder
           @position -= 1
         end
 
-        if @callbacks[@position]
-          @callbacks[@position].each do |block|
-            if !block.call
-              @callbacks[@position].delete block
+        @callback_mutex.synchronize do
+          if @callbacks[@position]
+            @callbacks[@position].each do |block|
+              if !block.call
+                @callbacks[@position].delete block
+              end
             end
           end
         end
