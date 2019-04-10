@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8" />
+
   <style type="text/css">
     body {
       font-family: 'sans-serif';
@@ -38,7 +40,7 @@
     }
 
     #arrow {
-      transition: transform 3s;
+      transition: transform 0.5s;
       transition-timing-function: linear;
     }
 
@@ -112,6 +114,16 @@
     }
   </style>
   <script type="text/javascript">
+    var ws;
+
+    document.addEventListener("DOMContentLoaded", function() {
+      ws = new WebSocket("ws://" + window.location.hostname + ":2345");
+      ws.onmessage = function(event) {
+        console.log(event.data);
+        rotorToBearing(event.data);
+      };
+    });
+
     function sendBearing(bearing) {
         ws.send(bearing); 
     }
@@ -154,14 +166,6 @@
     function setHeading(heading) {
         document.getElementById('n').setAttribute("transform", "rotate(" + -heading + " 270 270)");
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
-      var ws = new WebSocket("ws://" + window.location.hostname + ":2345");
-      ws.onmessage = function(event) {
-        console.log(event.data);
-        rotorToBearing(event.data);
-      };
-    });
   </script>
 </head>
 <body>
@@ -294,10 +298,7 @@
     /></g>
   </svg>
   <br />
-<!--
   <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); sendBearing(document.getElementById('bearing').value); return false">
--->
-  <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); rotorToBearing(document.getElementById('bearing').value); return false">
     Bearing:<br />
     <input type="text" id="bearing" autofocus="autofocus" autocomplete="off" /><br />
     <input type="submit" value="Rotate" /><br />

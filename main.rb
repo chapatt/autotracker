@@ -12,7 +12,7 @@ EM.run do
     end
 
     ws.onmessage do |msg, type|
-      rotor.to_position msg.to_s.to_i
+      rotor.to_rel_bearing msg.to_s.to_i
     end
 
     ws.onclose do
@@ -21,7 +21,7 @@ EM.run do
 
     last = 0
     EM::PeriodicTimer.new 0.5 do
-      if (last != (current = rotor.position))
+      if (last != (current = rotor.rel_bearing))
         ws.send(current)
         last = current
       end
