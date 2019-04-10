@@ -48,23 +48,61 @@
 
     #arrow text {
       fill: #ffffff;
-      font-family: 'sans-serif';
       font-feature-settings: 'onum';
       font-variant-numeric: oldstyle-nums;
+      font-family: 'sans-serif';
       font-weight: bold;
       font-size: 20px;
     }
 
     #negative-limit {
       transition: transform 1s;
+    }
 
-      fill: #ff0000;
+    #negative-limit .arrow {
+      fill: red;
+    }
+
+    #negative-limit .box {
+      fill: #aaaaee;
+    }
+
+    #negative-limit .bar {
+      fill: #f00;
+    }
+
+    #negative-limit text {
+      fill: white;
+      font-feature-settings: 'onum';
+      font-variant-numeric: oldstyle-nums;
+      font-family: 'sans-serif';
+      font-weight: bold;
+      font-size: 20px;
     }
 
     #positive-limit {
       transition: transform 1s;
+    }
 
-      fill: #00ff00;
+    #positive-limit .arrow {
+      fill: #0f0;
+    }
+
+    #positive-limit .box {
+      fill: #aaaaee;
+    }
+
+    #positive-limit .bar {
+      fill: #0f0;
+    }
+
+    #positive-limit text {
+      fill: white;
+      font-feature-settings: 'onum';
+      font-variant-numeric: oldstyle-nums;
+      font-family: 'sans-serif';
+      font-weight: bold;
+      font-size: 20px;
     }
 
     #n {
@@ -73,15 +111,60 @@
       fill: #000000;
     }
   </style>
+  <script type="text/javascript">
+    function sendBearing(bearing) {
+        ws.send(bearing); 
+    }
+
+    function rotorTargetToBearing(bearing) {
+        document.getElementById('arrow-target').setAttribute("transform", "rotate(" + bearing + " 270 270)");
+        document.querySelector('#arrow-target text').textContent = bearing + "°";
+        negativeLimitToBearing(-135);
+        positiveLimitToBearing(135);
+    }
+
+    function rotorToBearing(bearing) {
+        document.getElementById('arrow').setAttribute("transform", "rotate(" + bearing + " 270 270)");
+        document.querySelector('#arrow text').textContent = bearing + "°";
+    }
+
+    function calculateNegativeLimitBox() {
+        var bbox = document.querySelector('#negative-limit text').getBBox();
+        document.querySelector('#negative-limit .box').setAttribute("width", bbox.width + 10);
+        document.querySelector('#negative-limit .box').setAttribute("x", -bbox.width - 15);
+    }
+
+    function negativeLimitToBearing(bearing) {
+        document.getElementById('negative-limit').setAttribute("transform", "rotate(" + bearing + " 270 270)");
+        document.querySelector('#negative-limit text').textContent = bearing + "°";
+        calculateNegativeLimitBox()
+    }
+
+    function calculatePositiveLimitBox() {
+        var bbox = document.querySelector('#positive-limit text').getBBox();
+        document.querySelector('#positive-limit .box').setAttribute("width", bbox.width + 10);
+    }
+
+    function positiveLimitToBearing(bearing) {
+        document.getElementById('positive-limit').setAttribute("transform", "rotate(" + bearing + " 270 270)");
+        document.querySelector('#positive-limit text').textContent = bearing + "°";
+        calculatePositiveLimitBox()
+    }
+
+    function setHeading(heading) {
+        document.getElementById('n').setAttribute("transform", "rotate(" + -heading + " 270 270)");
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var ws = new WebSocket("ws://" + window.location.hostname + ":2345");
+      ws.onmessage = function(event) {
+        console.log(event.data);
+        rotorToBearing(event.data);
+      };
+    });
+  </script>
 </head>
 <body>
-  <script type="text/javascript">
-    var ws = new WebSocket("ws://" + window.location.hostname + ":2345");
-    ws.onmessage = function(event) {
-      console.log(event.data);
-      rotorToBearing(event.data);
-    };
-  </script>
   <svg id="rotor"
        xmlns="http://www.w3.org/2000/svg"
        xmlns:svg="http://www.w3.org/2000/svg"
@@ -108,8 +191,8 @@
            h 90
            v -140
            h 42.32051
-           l -87.32051,-148.56406
-           l -87.32051,148.56406
+           l -87.32051 -148.56406
+           l -87.32051 148.56406
            z"
       />
       <text x="0" y="-45" text-anchor="middle">0°</text>
@@ -133,27 +216,65 @@
            h 70
            v -140
            h 35
-           l -70,-121.243557
-           l -70,121.243557
+           l -70 -121.243557
+           l -70 121.243557
            z"
         mask="url(#target-bearing-window)"
       />
       <text x="0" y="-75" text-anchor="middle">0°</text>
     </g></g>
-    <g id="negative-limit"><rect
-      transform="translate(270 270)"
-      x="-10"
-      y="-225"
-      width="20"
-      height="30"
-    /></g>
-    <g id="positive-limit"><rect
-      transform="translate(270 270)"
-      x="-10"
-      y="-225"
-      width="20"
-      height="30"
-    /></g>
+    <g id="negative-limit"><g transform="translate(270 270)">
+      <path
+        class="arrow"
+        d="m 15 -225
+           l -15 15
+           l 15 15
+           z"
+      />
+      <rect
+        class="box"
+        x="-25"
+        y="-225"
+        width="20"
+        height="30"
+        rx="10"
+        ry="10"
+      />
+      <rect
+        class="bar"
+        x="-5"
+        y="-225"
+        width="5"
+        height="30"
+      />
+      <text x="-10" y="-200" text-anchor="end">0°</text>
+    </g></g>
+    <g id="positive-limit"><g transform="translate(270 270)">
+      <path
+        class="arrow"
+        d="m -15 -225
+           l 15 15
+           l -15 15
+           z"
+      />
+      <rect
+        class="box"
+        x="5"
+        y="-225"
+        width="20"
+        height="30"
+        rx="10"
+        ry="10"
+      />
+      <rect
+        class="bar"
+        x="0"
+        y="-225"
+        width="5"
+        height="30"
+      />
+      <text x="10" y="-200" text-anchor="start">0°</text>
+    </g></g>
     <!-- (40 - x) ^ 2 + 14 ^ 2 = ((14 / 8) * x)^2 -->
     <!-- x = (-640 / 33) + ((56 sqrt(433)) / 33) = 15.91771 -->
     <!-- 40 - 15.91771 = 24.08229 -->
@@ -172,38 +293,11 @@
          z"
     /></g>
   </svg>
-  <script type="text/javascript">
-    function sendBearing(bearing) {
-        ws.send(bearing); 
-    }
-
-    function rotorTargetToBearing(bearing) {
-        document.getElementById('arrow-target').setAttribute("transform", "rotate(" + bearing + " 270 270)");
-        document.querySelector('#arrow-target text').textContent = bearing + "°";
-    }
-
-    function rotorToBearing(bearing) {
-        document.getElementById('arrow').setAttribute("transform", "rotate(" + bearing + " 270 270)");
-        document.querySelector('#arrow text').textContent = bearing + "°";
-    }
-
-    function negativeLimitToBearing(bearing) {
-        document.getElementById('negative-limit').setAttribute("transform", "rotate(" + bearing + " 270 270)");
-    }
-
-    function positiveLimitToBearing(bearing) {
-        document.getElementById('positive-limit').setAttribute("transform", "rotate(" + bearing + " 270 270)");
-    }
-
-    function setHeading(heading) {
-        document.getElementById('n').setAttribute("transform", "rotate(" + -heading + " 270 270)");
-    }
-  </script>
   <br />
-  <form onsubmit="rotorToBearing(document.getElementById('bearing').value); rotorTargetToBearing(document.getElementById('bearing').value); return false">
 <!--
-  <form onsubmit="sendBearing(document.getElementById('bearing').value); return false">
+  <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); sendBearing(document.getElementById('bearing').value); return false">
 -->
+  <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); rotorToBearing(document.getElementById('bearing').value); return false">
     Bearing:<br />
     <input type="text" id="bearing" autofocus="autofocus" autocomplete="off" /><br />
     <input type="submit" value="Rotate" /><br />
