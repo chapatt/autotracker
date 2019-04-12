@@ -9,7 +9,12 @@
       font-style: normal;
       font-weight: normal;
       src: local('Vollkorn Regular'), local('Vollkorn-Regular'),
-        url('./vollkorn-v9-latin-regular.woff') format('woff');
+        url('./fonts/Vollkorn-Regular.woff') format('woff');
+      unicode-range: U+30-39, U+28-29;
+    }
+
+    @font-feature-values Vollkorn {
+      @styleset { boring-one: 11; }
     }
 
     @font-face {
@@ -17,27 +22,32 @@
       font-style: normal;
       font-weight: bold;
       src: local('Vollkorn Bold'), local('Vollkorn-Bold'),
-        url('./vollkorn-v9-latin-700.woff') format('woff');
+        url('./fonts/Vollkorn-Bold.woff') format('woff');
+      unicode-range: U+30-39;
     }
 
     body {
+      --blue: #aae;
+
       font-family: sans-serif;
     }
 
-    svg text {
+    #rotor {
+      float: left;
+      width: 540px;
+      height: 540px;
+    }
+
+    #rotor text {
       font-family: 'Vollkorn';
       font-feature-settings: 'onum';
       font-variant-numeric: oldstyle-nums;
-    }
-
-    #rotor {
-      width: 550px;
-      height: 550px;
+      font-variant-alternates: styleset(boring-one);
     }
 
     #circle {
       fill: none;
-      stroke: #aaaaee;
+      stroke: var(--blue);
       stroke-width: 10;
     }
 
@@ -47,29 +57,31 @@
 
     #arrow-target path {
       fill: none;
-      stroke: #aaaaee;
+      stroke: var(--blue);
       stroke-width: 5;
       stroke-dasharray: 10;
     }
 
     #arrow-target text {
-      fill: #aaaaee;
+      fill: var(--blue);
       font-weight: bold;
       font-size: 20px;
-    }
-
-    #target-coordinates {
-      fill: #aaaaee;
-    }
-
-    #rotor-coordinates {
-      fill: #000000;
     }
 
     .coordinates {
       letter-spacing: 0.1em;
       font-size: 15px;
       font-weight: 400;
+      font-feature-settings: 'tnum';
+      font-variant-numeric: tabular-nums;
+    }
+
+    #target-coordinates {
+      fill: var(--blue);
+    }
+
+    #rotor-coordinates {
+      fill: black;
     }
 
     #arrow {
@@ -78,7 +90,7 @@
     }
 
     #arrow path {
-      fill: #000000;
+      fill: black;
     }
 
     #arrow text {
@@ -107,37 +119,64 @@
     }
 
     #negative-limit .symbol {
+      fill: #a55;
+    }
+
+    #negative-limit.active .symbol {
       fill: #f00;
+      filter: url(#glow);
     }
 
     #positive-limit .symbol {
+      fill: #5a5;
+    }
+
+    #positive-limit.active .symbol {
       fill: #0f0;
+      filter: url(#glow);
     }
 
     #negative-limit .box {
-      fill: #aaaaee;
+      fill: var(--blue);
     }
 
     #positive-limit .box {
-      fill: #aaaaee;
+      fill: var(--blue);
     }
 
     #n {
       transition: transform 0.5s;
 
-      fill: #000000;
+      fill: black;
     }
   </style>
   <script type="text/javascript">
     var ws;
 
     document.addEventListener("DOMContentLoaded", function() {
-      ws = new WebSocket("ws://" + window.location.hostname + ":2345");
-      ws.onmessage = function(event) {
-        console.log(event.data);
-        rotorToBearing(event.data);
-      };
+        try {
+            ws = new WebSocket("ws://" + window.location.hostname + ":2345");
+        } catch (error) {
+            console.error(error);
+        }
+        if (ws) {
+            ws.onmessage = function(event) {
+                console.log(event.data);
+                rotorToBearing(event.data);
+            };
+        }
     });
+
+    Number.prototype.coterminalInTurn = function(turn, base=360) {
+        if ((positiveInFirstTurn = this % base) < 0) {
+            positiveInFirstTurn += base
+        }
+
+        if (turn > 0)
+            return positiveInFirstTurn + ((Math.abs(turn) - 1) * base)
+        else
+            return (positiveInFirstTurn - base) - ((Math.abs(turn) - 1) * base)
+    };
 
     function sendBearing(bearing) {
         ws.send(bearing); 
@@ -146,8 +185,6 @@
     function rotorTargetToBearing(bearing) {
         document.getElementById('arrow-target').setAttribute("transform", "rotate(" + bearing + " 270 270)");
         document.querySelector('#arrow-target text').textContent = bearing + "°";
-        negativeLimitToBearing(-135);
-        positiveLimitToBearing(135);
     }
 
     function rotorToBearing(bearing) {
@@ -164,7 +201,25 @@
     function negativeLimitToBearing(bearing) {
         document.getElementById('negative-limit').setAttribute("transform", "rotate(" + bearing + " 270 270)");
         document.querySelector('#negative-limit text').textContent = bearing + "°";
-        calculateNegativeLimitBox()
+
+        var normalizedBearing = bearing.coterminalInTurn(1);
+        if (normalizedBearing > 90 && normalizedBearing < 270) {
+            var bbox = document.querySelector('#negative-limit text').getBBox();
+            document.querySelector('#negative-limit text').setAttribute("transform", "rotate(180 " + (bbox.x + (bbox.width / 2)) + " " + (bbox.y + (bbox.height / 2)) + ")");
+        } else {
+            document.querySelector('#negative-limit text').setAttribute("transform", "");
+        }
+
+        calculateNegativeLimitBox();
+    }
+
+    function setNegativeLimitActive(active) {
+        negativeLimit = document.getElementById('negative-limit');
+        classes = negativeLimit.classList;
+        if (active)
+            classes.add("active");
+        else
+            classes.remove("active");
     }
 
     function calculatePositiveLimitBox() {
@@ -175,7 +230,25 @@
     function positiveLimitToBearing(bearing) {
         document.getElementById('positive-limit').setAttribute("transform", "rotate(" + bearing + " 270 270)");
         document.querySelector('#positive-limit text').textContent = bearing + "°";
-        calculatePositiveLimitBox()
+
+        var normalizedBearing = bearing.coterminalInTurn(1);
+        if (normalizedBearing > 90 && normalizedBearing < 270) {
+            var bbox = document.querySelector('#positive-limit text').getBBox();
+            document.querySelector('#positive-limit text').setAttribute("transform", "rotate(180 " + (bbox.x + (bbox.width / 2)) + " " + (bbox.y + (bbox.height / 2)) + ")");
+        } else {
+            document.querySelector('#positive-limit text').setAttribute("transform", "");
+        }
+
+        calculatePositiveLimitBox();
+    }
+
+    function setPositiveLimitActive(active) {
+        positiveLimit = document.getElementById('positive-limit');
+        classes = positiveLimit.classList;
+        if (active)
+            classes.add("active");
+        else
+            classes.remove("active");
     }
 
     function setHeading(heading) {
@@ -224,6 +297,13 @@
         d="m -200 0
            A 200 200 0 0 0 200 0"
       />
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
+        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
     </defs>
     <circle
       id="circle"
@@ -251,12 +331,12 @@
     </g></g>
     <text text-anchor="start" id="rotor-coordinates" class="coordinates">
       <textPath xlink:href="#coordinate-path">
-        28°23′42″N -80°43′32″W
+        37°28′14″N -70°65′91″W
       </textPath>
     </text>
     <text text-anchor="end" id="target-coordinates" class="coordinates">
       <textPath xlink:href="#coordinate-path" startOffset="100%">
-        28°23′42″N -80°43′32″W
+        37°28′14″N -70°65′91″W
       </textPath>
     </text>
     <g id="arrow"><g transform="translate(270 270)">
