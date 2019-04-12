@@ -2,7 +2,9 @@ require_relative 'rotor.rb'
 require_relative 'dc_motor.rb'
 require_relative 'encoder.rb'
 require_relative 'home_sensor.rb'
-require_relative 'angle.rb'
+
+require_relative 'core_extensions/numeric/angle.rb'
+Numeric.include CoreExtensions::Numeric::Angle
 
 class DCRotor < Rotor
   def initialize
@@ -15,7 +17,7 @@ class DCRotor < Rotor
   def to_rel_bearing target_rel_bearing
     super
 
-    target = Angle::angleClosestTo @encoder.position, coterminalWith: target_rel_bearing
+    target = target_rel_bearing.coterminalClosestTo @encoder.position
 
     if @encoder.position < target
       @encoder.direction = :clockwise
