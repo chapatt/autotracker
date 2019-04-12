@@ -4,8 +4,30 @@
   <meta charset="utf-8" />
 
   <style type="text/css">
+    @font-face {
+      font-family: 'Vollkorn';
+      font-style: normal;
+      font-weight: normal;
+      src: local('Vollkorn Regular'), local('Vollkorn-Regular'),
+        url('./vollkorn-v9-latin-regular.woff') format('woff');
+    }
+
+    @font-face {
+      font-family: 'Vollkorn';
+      font-style: normal;
+      font-weight: bold;
+      src: local('Vollkorn Bold'), local('Vollkorn-Bold'),
+        url('./vollkorn-v9-latin-700.woff') format('woff');
+    }
+
     body {
       font-family: sans-serif;
+    }
+
+    svg text {
+      font-family: 'Vollkorn';
+      font-feature-settings: 'onum';
+      font-variant-numeric: oldstyle-nums;
     }
 
     #rotor {
@@ -32,11 +54,22 @@
 
     #arrow-target text {
       fill: #aaaaee;
-      font-family: 'sans-serif';
-      font-feature-settings: 'onum';
-      font-variant-numeric: oldstyle-nums;
       font-weight: bold;
       font-size: 20px;
+    }
+
+    #target-coordinates {
+      fill: #aaaaee;
+    }
+
+    #rotor-coordinates {
+      fill: #000000;
+    }
+
+    .coordinates {
+      letter-spacing: 0.1em;
+      font-size: 15px;
+      font-weight: 400;
     }
 
     #arrow {
@@ -50,61 +83,43 @@
 
     #arrow text {
       fill: #ffffff;
-      font-feature-settings: 'onum';
-      font-variant-numeric: oldstyle-nums;
-      font-family: 'sans-serif';
-      font-weight: bold;
+      font-weight: 700;
       font-size: 20px;
     }
 
-    #negative-limit {
+    .limit {
       transition: transform 1s;
     }
 
-    #negative-limit .arrow {
-      fill: red;
+    .symbol:hover ~ .box, .symbol:hover ~ text {
+      visibility: visible;
+    }
+
+    .limit text {
+      fill: white;
+      font-weight: bold;
+      font-size: 20px;
+      visibility: hidden;
+    }
+
+    .limit .box {
+      visibility: hidden;
+    }
+
+    #negative-limit .symbol {
+      fill: #f00;
+    }
+
+    #positive-limit .symbol {
+      fill: #0f0;
     }
 
     #negative-limit .box {
       fill: #aaaaee;
     }
 
-    #negative-limit .bar {
-      fill: #f00;
-    }
-
-    #negative-limit text {
-      fill: white;
-      font-feature-settings: 'onum';
-      font-variant-numeric: oldstyle-nums;
-      font-family: 'sans-serif';
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    #positive-limit {
-      transition: transform 1s;
-    }
-
-    #positive-limit .arrow {
-      fill: #0f0;
-    }
-
     #positive-limit .box {
       fill: #aaaaee;
-    }
-
-    #positive-limit .bar {
-      fill: #0f0;
-    }
-
-    #positive-limit text {
-      fill: white;
-      font-feature-settings: 'onum';
-      font-variant-numeric: oldstyle-nums;
-      font-family: 'sans-serif';
-      font-weight: bold;
-      font-size: 20px;
     }
 
     #n {
@@ -169,14 +184,47 @@
   </script>
 </head>
 <body>
-  <svg id="rotor"
-       xmlns="http://www.w3.org/2000/svg"
-       xmlns:svg="http://www.w3.org/2000/svg"
-       xmlns:xlink="http://www.w3.org/1999/xlink"
-       width="540"
-       height="540"
-       version="1.1"
+  <svg
+    id="rotor"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="540"
+    height="540"
   >
+    <defs>
+      <!-- start node x = (55 * cos(pi * 0.34)) = 26.49645 -->
+      <!-- node y = -(55 * sin(pi * 0.34)) = -48.19687 -->
+      <!-- end node x = (55 * cos(pi * 0.66)) = -26.49645 -->
+      <path
+        id="target-bearing-window"
+        d="m 26.49645 -48.19687
+           A 55 55 0 0 0 -26.49645 -48.1968"
+        stroke-width="27"
+      />
+      <g id="limit-symbol">
+        <path
+          class="arrow"
+          d="m 10 -220
+             l -10 10
+             l 10 10
+             z"
+        />
+        <rect
+          class="bar"
+          x="-5"
+          y="-220"
+          width="5"
+          height="20"
+        />
+      </g>
+      <path
+        id="coordinate-path"
+        transform="translate(270 270)"
+        d="m -200 0
+           A 200 200 0 0 0 200 0"
+      />
+    </defs>
     <circle
       id="circle"
       cx="270"
@@ -201,24 +249,27 @@
       />
       <text x="0" y="-50" text-anchor="middle">0°</text>
     </g></g>
+    <text text-anchor="start" id="rotor-coordinates" class="coordinates">
+      <textPath xlink:href="#coordinate-path">
+        28°23′42″N -80°43′32″W
+      </textPath>
+    </text>
+    <text text-anchor="end" id="target-coordinates" class="coordinates">
+      <textPath xlink:href="#coordinate-path" startOffset="100%">
+        28°23′42″N -80°43′32″W
+      </textPath>
+    </text>
     <g id="arrow"><g transform="translate(270 270)">
-      <mask id="target-bearing-window">
+      <mask id="target-bearing-window-mask">
         <rect x="-50%" y="-50%" width="100%" height="100%" fill="white" />
-        <!-- start node x = (55 * cos(pi * 0.34)) = 26.49645 -->
-        <!-- node y = -(55 * sin(pi * 0.34)) = -48.19687 -->
-        <!-- end node x = (55 * cos(pi * 0.66)) = -26.49645 -->
-        <path
-          d="m 26.49645 -48.19687
-             A 55 55 0 0 0 -26.49645 -48.1968"
+        <use
+          xlink:href="#target-bearing-window"
           stroke="black"
-          stroke-width="27"
         />
-        <path
-          transform="rotate(180 0 0)"
-          d="m 26.49645 -48.19687
-             A 55 55 0 0 0 -26.49645 -48.1968"
+        <use
+          xlink:href="#target-bearing-window"
           stroke="black"
-          stroke-width="27"
+          transform="rotate(180 0 0)"
         />
       </mask>
       <path
@@ -230,18 +281,12 @@
            l -70 -121.243557
            l -70 121.243557
            z"
-        mask="url(#target-bearing-window)"
+        mask="url(#target-bearing-window-mask)"
       />
       <text x="0" y="-80" text-anchor="middle">0°</text>
     </g></g>
-    <g id="negative-limit"><g transform="translate(270 270)">
-      <path
-        class="arrow"
-        d="m 15 -225
-           l -15 15
-           l 15 15
-           z"
-      />
+    <g id="negative-limit" class="limit"><g transform="translate(270 270)">
+      <use xlink:href="#limit-symbol" class="symbol" />
       <rect
         class="box"
         x="-25"
@@ -251,23 +296,10 @@
         rx="10"
         ry="10"
       />
-      <rect
-        class="bar"
-        x="-5"
-        y="-225"
-        width="5"
-        height="30"
-      />
       <text x="-10" y="-205" text-anchor="end">0°</text>
     </g></g>
-    <g id="positive-limit"><g transform="translate(270 270)">
-      <path
-        class="arrow"
-        d="m -15 -225
-           l 15 15
-           l -15 15
-           z"
-      />
+    <g id="positive-limit" class="limit"><g transform="translate(270 270)">
+      <use xlink:href="#limit-symbol" class="symbol" transform="scale(-1 1)" />
       <rect
         class="box"
         x="5"
@@ -276,13 +308,6 @@
         height="30"
         rx="10"
         ry="10"
-      />
-      <rect
-        class="bar"
-        x="0"
-        y="-225"
-        width="5"
-        height="30"
       />
       <text x="10" y="-205" text-anchor="start">0°</text>
     </g></g>
@@ -305,7 +330,10 @@
     /></g>
   </svg>
   <br />
+<!--
   <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); sendBearing(document.getElementById('bearing').value); return false">
+-->
+  <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); return false">
     Bearing:<br />
     <input type="text" id="bearing" autofocus="autofocus" autocomplete="off" /><br />
     <input type="submit" value="Rotate" /><br />
