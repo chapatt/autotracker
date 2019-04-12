@@ -2,6 +2,7 @@ require_relative 'rotor.rb'
 require_relative 'dc_motor.rb'
 require_relative 'encoder.rb'
 require_relative 'home_sensor.rb'
+require_relative 'angle.rb'
 
 class DCRotor < Rotor
   def initialize
@@ -11,16 +12,18 @@ class DCRotor < Rotor
     @encoder = Encoder.instance
   end
 
-  def to_rel_bearing rel_bearing
+  def to_rel_bearing target_rel_bearing
     super
 
-    if @encoder.position < rel_bearing
+    target = Angle::angleClosestTo @encoder.position, coterminalWith: target_rel_bearing
+
+    if @encoder.position < target
       @encoder.direction = :clockwise
-      @encoder.call_at(rel_bearing) { @motor.stop_cw; false }
+      @encoder.call_at(target) { @motor.stop_cw; false }
       @motor.start_cw
-    elsif @encoder.position > rel_bearing
+    elsif @encoder.position > target
       @encoder.direction = :counterclockwise
-      @encoder.call_at(rel_bearing) { @motor.stop_ccw; false }
+      @encoder.call_at(target) { @motor.stop_ccw; false }
       @motor.start_ccw
     end
   end
