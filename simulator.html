@@ -328,10 +328,11 @@
             positiveInFirstTurn += base
         }
 
+        var fullTurns = (Math.abs(turn) - 1) * base;
         if (turn > 0)
-            return positiveInFirstTurn + ((Math.abs(turn) - 1) * base)
+            return positiveInFirstTurn + fullTurns;
         else
-            return (positiveInFirstTurn - base) - ((Math.abs(turn) - 1) * base)
+            return (positiveInFirstTurn - (positiveInFirstTurn == 0 ? 0 : base)) - fullTurns;
     };
 
     function sendBearing(bearing) {

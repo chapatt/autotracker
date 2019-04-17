@@ -6,10 +6,11 @@ module CoreExtensions
           positive_in_first_turn += withBase
         end
     
+        full_turns = (turn.abs - 1) * withBase
         if turn.positive?
-          return positive_in_first_turn + ((turn.abs - 1) * withBase)
+          return positive_in_first_turn + full_turns
         else
-          return (positive_in_first_turn - withBase) - ((turn.abs - 1) * withBase)
+          return (positive_in_first_turn - (positive_in_first_turn == 0 ? 0 : withBase)) - full_turns
         end
       end
     
