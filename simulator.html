@@ -28,14 +28,94 @@
 
     body {
       --blue: #aae;
+      --module-border-width: 0.25rem;
+      --module-border-radius: 0.75rem;
 
       font-family: sans-serif;
+      padding: 0.5rem;
+      margin: 0;
+    }
+
+    .module {
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
+      overflow: hidden;
+      min-width: fit-content;
+    }
+
+    .module > .title {
+      margin-left: calc(var(--module-border-radius) - (var(--module-border-width) / 2));
+      margin-bottom: 0;
+      font-size: 0.75em;
+      font-weight: normal;
+      color: #555;
+      display: inline;
+    }
+
+    .module.collapsed > .title {
+      border-bottom-color: #555;
+      border-bottom-style: dotted;
+      border-bottom-width: 1px;
+    }
+
+    .module > .content {
+      border-style: solid;
+      border-color: #ccc;
+      border-width: var(--module-border-width);
+      border-radius: var(--module-border-radius);
+      padding: calc((var(--module-border-radius) - (var(--module-border-width) / 2)) - var(--module-border-width));
+    }
+
+    .module.collapsed > .content {
+      display: none;
+    }
+
+    .module > .content .section {
+      margin-bottom: 0.5em;
+    }
+
+    .module > .content .section:last-child {
+      margin-bottom: 0;
+    }
+
+    .module > .content .section .heading {
+      font-size: 0.75em;
+      font-weight: normal;
+      color: #555;
+      border-bottom-style: solid;
+      border-bottom-color: #ccc;
+      border-bottom-width: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    #sources > .content table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    #sources > .content table td, #sources > .content table th {
+      padding: 0 1em 0 0;
+    }
+
+    #sources > .content table td:last-child, #sources > .content table th:last-child {
+      padding: 0;
+    }
+
+    #sources > .content table th {
+      font-weight: normal;
+      font-size: 0.75em;
+      text-align: left;
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+      border-bottom-color: #ccc;
+      color: #555;
     }
 
     #rotor {
       float: left;
       width: 540px;
       height: 540px;
+      margin-right: 0.5rem;
     }
 
     #rotor text {
@@ -150,6 +230,74 @@
       fill: black;
     }
   </style>
+
+  <link rel="stylesheet" type="text/css" href="./widgets.css" />
+  <script type="text/javascript" src="./widgets.js"></script>
+
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        var textBox1 = chapatt.TextBox.new(document.getElementById('text-box-1'));
+        textBox1.getValueModel().signalConnect('valueChanged', function() {
+            console.log('text-box-1: valueChanged');
+        });
+
+        var toggleButtonGroup1 = chapatt.ToggleButtonGroup.new(document.getElementById('toggle-button-group-1'));
+            toggleButtonGroup1.valueModel.signalConnect('valueChanged', function(targetWidget, signalName, signalData, userData) {
+                console.log('toggle-button-group-1: valueChanged from ' + toggleButtonGroup1.valueModel.getValue() + ' to ' + signalData);
+        });
+
+        var angleUnits = [
+            chapatt.Unit.new('degrees', 'deg',
+                function(valueAsThis) {
+                    return valueAsThis;
+                },
+                function(valueAsDefault) {
+                    return valueAsDefault;
+                }
+            )
+        ];
+
+        /* Bearing */
+        var bearingSlider = chapatt.Slider.new(document.getElementById('bearing-slider'), angleUnits, 0, 360);
+
+        function bearingButtonCallback(targetWidget, signalName, signalData, userData) {
+/*
+            rotorTargetToBearing(bearingSlider.getValueModel().getValue());
+            sendBearing(bearingSlider.getValueModel().getValue());
+*/
+            rotorTargetToBearing(bearingSlider.getValueModel().getValue());
+        }
+        var bearingButton = chapatt.Button.new(document.getElementById('bearing-button'), 1);
+        bearingButton.signalConnect('clicked', bearingButtonCallback, null);
+
+        /* Heading */
+        var headingSlider = chapatt.Slider.new(document.getElementById('heading-slider'), angleUnits, 0, 360);
+
+        function headingButtonCallback(targetWidget, signalName, signalData, userData) {
+            setHeading(headingSlider.getValueModel().getValue());
+        }
+        var headingButton = chapatt.Button.new(document.getElementById('heading-button'), 1);
+        headingButton.signalConnect('clicked', headingButtonCallback, null);
+
+        /* CCW Limit */
+        var negativeLimitSpinBox = chapatt.SpinBox.new(document.getElementById('negative-limit-spin-box'), angleUnits);
+
+        function negativeLimitButtonCallback(targetWidget, signalName, signalData, userData) {
+            negativeLimitToBearing(negativeLimitSpinBox.getValueModel().getValue());
+        }
+        var negativeLimitButton = chapatt.Button.new(document.getElementById('negative-limit-button'), 1);
+        negativeLimitButton.signalConnect('clicked', negativeLimitButtonCallback, null);
+
+        var positiveLimitSpinBox = chapatt.SpinBox.new(document.getElementById('positive-limit-spin-box'), angleUnits);
+
+        function positiveLimitButtonCallback(targetWidget, signalName, signalData, userData) {
+            positiveLimitToBearing(positiveLimitSpinBox.getValueModel().getValue());
+        }
+        var positiveLimitButton = chapatt.Button.new(document.getElementById('positive-limit-button'), 1);
+        positiveLimitButton.signalConnect('clicked', positiveLimitButtonCallback, null);
+    });
+  </script>
+
   <script type="text/javascript">
     var ws;
 
@@ -165,6 +313,14 @@
                 rotorToBearing(event.data);
             };
         }
+
+        var modules = Array.from(document.getElementsByClassName('module'));
+        modules.forEach(function(module) {
+            var title = module.getElementsByClassName('title')[0];
+            title.addEventListener('click', function() {
+                module.classList.toggle("collapsed");
+            });
+        });
     });
 
     Number.prototype.coterminalInTurn = function(turn, base=360) {
@@ -409,19 +565,187 @@
          z"
     /></g>
   </svg>
-  <br />
-<!--
-  <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); sendBearing(document.getElementById('bearing').value); return false">
--->
-  <form onsubmit="rotorTargetToBearing(document.getElementById('bearing').value); return false">
-    Bearing:<br />
-    <input type="text" id="bearing" autofocus="autofocus" autocomplete="off" /><br />
-    <input type="submit" value="Rotate" /><br />
-  </form><br />
-  <form onsubmit="setHeading(document.getElementById('heading').value); return false">
-    Heading:<br />
-    <input type="text" id="heading" autocomplete="off" /><br />
-    <input type="submit" value="Steer" />
-  </form>
+  <div id="sources" class="module collapsed">
+    <h2 class="title">Data Sources</h2>
+    <div class="content">
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Status</th>
+        </tr>
+        <tr>
+          <td>Bow</td>
+          <td>(0.5, 6)</td>
+          <td>Connected</td>
+        </tr>
+        <tr>
+          <td>Stern</td>
+          <td>(0, -12)</td>
+          <td>Connected</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="module">
+    <h2 class="title">Relative Bearing</h2>
+    <div class="content">
+      <div style="margin-bottom: 0.5em">
+        <ul id="toggle-button-group-1" class="example-widget example-button-group">
+          <li class="example-button example-toggle-button button">
+            <div>Auto</div>
+          </li>
+          <li class="example-button example-toggle-button button selected">
+            <div>Manual</div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div id="bearing-slider" class="example-widget example-slider" style="margin-right: 0.25em">
+          <div class="bar" style="width: 50%;"></div>
+          <div class="overlay">
+            <div class="decrease">
+              <div style="font-size: 0.6em;">&#x25c0;</div>
+            </div>
+            <div class="label">
+              <div>Bearing:</div>
+            </div>
+            <div class="increase">
+              <div style="font-size: 0.6em;">&#x25b6;</div>
+            </div>
+            <div class="field">
+              <div contenteditable="true">180 deg</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="bearing-button" class="example-widget example-button">
+          <div>Rotate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="module">
+    <h2 class="title">Heading</h2>
+    <div class="content">
+      <div style="margin-bottom: 0.5em">
+        <ul id="toggle-button-group-1" class="example-widget example-button-group">
+          <li class="example-button example-toggle-button button">
+            <div>Auto</div>
+          </li>
+          <li class="example-button example-toggle-button button selected">
+            <div>Manual</div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div id="heading-slider" class="example-widget example-slider" style="margin-right: 0.25em">
+          <div class="bar" style="width: 50%;"></div>
+          <div class="overlay">
+            <div class="decrease">
+              <div style="font-size: 0.6em;">&#x25c0;</div>
+            </div>
+            <div class="label">
+              <div>Heading:</div>
+            </div>
+            <div class="increase">
+              <div style="font-size: 0.6em;">&#x25b6;</div>
+            </div>
+            <div class="field">
+              <div contenteditable="true">180 deg</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="heading-button" class="example-widget example-button">
+          <div>Steer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="module collapsed">
+    <h2 class="title">Location</h2>
+    <div class="content">
+      <div class="section">
+        <div style="margin-bottom: 0.5em">
+          <div class="heading">Rotor</div>
+          <ul id="toggle-button-group-1" class="example-widget example-button-group">
+            <li class="example-button example-toggle-button button">
+              <div>Auto</div>
+            </li>
+            <li class="example-button example-toggle-button button selected">
+              <div>Manual</div>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div id="text-box-1" class="example-widget example-text-box" style="width: 15em; margin-right: 0.25em">
+            <div class="field">
+              <div contenteditable="true"></div>
+              <div class="hint">coordinates</div>
+            </div>
+          </div>
+
+          <div id="button-1" class="example-widget example-button">
+            <div>Move</div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="heading">Target:</div>
+        <div id="text-box-1" class="example-widget example-text-box" style="width: 15em; margin-right: 0.25em">
+          <div class="field">
+            <div contenteditable="true"></div>
+            <div class="hint">coordinates</div>
+          </div>
+        </div>
+
+        <div id="button-1" class="example-widget example-button">
+          <div>Move</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="module">
+    <h2 class="title">Limits</h2>
+    <div class="content">
+      <div class="section">
+        <div class="heading">CCW</div>
+        <div id="negative-limit-spin-box" class="example-widget example-spin-box" style="margin-right: 0.25em">
+          <div class="decrease">
+            <div style="font-size: 0.6em;">&#x25c0;</div>
+          </div>
+          <div class="field">
+            <div contenteditable="true">180 deg</div>
+          </div>
+          <div class="increase">
+            <div style="font-size: 0.6em;">&#x25b6;</div>
+          </div>
+        </div>
+
+        <div id="negative-limit-button" class="example-widget example-button">
+          <div>Set</div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="heading">CW</div>
+        <div id="positive-limit-spin-box" class="example-widget example-spin-box" style="margin-right: 0.25em">
+          <div class="decrease">
+            <div style="font-size: 0.6em;">&#x25c0;</div>
+          </div>
+          <div class="field">
+            <div contenteditable="true">180 deg</div>
+          </div>
+          <div class="increase">
+            <div style="font-size: 0.6em;">&#x25b6;</div>
+          </div>
+        </div>
+
+        <div id="positive-limit-button" class="example-widget example-button">
+          <div>Set</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

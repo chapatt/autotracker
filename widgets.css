@@ -1,0 +1,668 @@
+/*
+ * Widget
+ */
+
+.example-widget {
+  --height: 1.5em;
+  --border-width: 1px;
+  --border-radius: 0.25em;
+  --padding: 0.5em;
+  --control-width: var(--height);
+
+  --color-normal: #eeeeee;
+  --color-normal-hover: #ffffff;
+  --color-normal-active: #dddddd;
+
+  --color-accent: #9999dd;
+  --color-accent-hover: #bbbbff;
+  --color-accent-active: #7777bb;
+
+  --color-border: #cccccc;
+
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  vertical-align: middle;
+  cursor: default;
+  box-sizing: border-box;
+  height: var(--height);
+  margin: 0;
+  border-width: var(--border-width);
+  border-style: solid;
+  border-radius: var(--border-radius);
+  border-color: var(--color-border);
+  background-color: var(--color-normal);
+}
+
+
+
+
+
+/*
+ * TextBox
+ */
+
+.example-text-box > .field > * {
+  padding: 0 var(--padding);
+}
+
+.example-text-box > .field > * {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+  width: 100%;
+}
+
+.example-text-box > .field > * {
+  cursor: text;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.example-text-box > .field > *:not(:empty) ~ .hint {
+  visibility: hidden;
+}
+
+.example-text-box > .field > .hint {
+  color: var(--color-border);
+  z-index: 0;
+}
+
+
+
+
+
+/*
+ * Button
+ */
+
+.example-button {
+  background-color: var(--color-normal);
+  padding: 0 var(--padding);
+}
+
+.example-button:hover {
+  background-color: var(--color-normal-hover);
+}
+
+.example-button:active {
+  background-color: var(--color-normal-active);
+}
+
+.example-button > * {
+  display: inline-block;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+}
+
+
+
+
+
+/*
+ * ToggleButton
+ */
+
+.example-toggle-button.selected {
+  background-color: var(--color-accent);
+}
+
+.example-toggle-button.selected:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.example-toggle-button.selected:active {
+  background-color: var(--color-accent-active);
+}
+
+
+
+
+
+/*
+ * SpinBox
+ */
+
+.example-spin-box:hover {
+  background-color: var(--color-normal-hover);
+}
+
+.example-spin-box:active {
+  background-color: var(--color-normal-active);
+}
+
+.example-spin-box > * {
+  float: left;
+  height: 100%;
+}
+
+.example-spin-box > * > * {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+}
+
+.example-spin-box > .decrease {
+  padding-left: var(--padding);
+}
+
+.example-spin-box > .field {
+  padding: 0 var(--padding);
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+
+  width: 4em;
+}
+
+.example-spin-box > .increase {
+  padding-right: var(--padding);
+}
+
+
+.example-spin-box-tall {
+  height: calc((var(--height) * 2) - var(--border-width));
+}
+
+.example-spin-box-tall * {
+  display: inline-block;
+  position: relative;
+}
+
+.example-spin-box-tall > .field {
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+  text-align: right;
+  cursor: text;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 var(--padding);
+
+  width: 3em;
+}
+
+.example-spin-box-tall > .controls {
+  height: 100%;
+  box-sizing: border-box;
+  border-left-width: var(--border-width);
+  border-left-style: solid;
+  border-left-color: var(--color-border);
+
+  box-sizing: border-box;
+  width: var(--control-width);
+}
+
+.example-spin-box-tall > .controls > * {
+  height: calc(50% - (var(--border-width) / 2));
+  border-bottom-width: var(--border-width);
+  border-bottom-style: solid;
+  border-bottom-color: var(--color-border);
+  display: block;
+  text-align: center;
+  padding: 0;
+}
+
+.example-spin-box-tall > .controls > *:hover {
+  background-color: var(--color-normal-hover);
+}
+
+.example-spin-box-tall > .controls > *:active {
+  background-color: var(--color-normal-active);
+}
+
+.example-spin-box-tall > .controls > .increase {
+}
+
+.example-spin-box-tall > .controls > .decrease {
+}
+
+.example-spin-box-tall > .controls > * > * {
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+}
+
+
+
+
+
+/*
+ * Bar
+ */
+
+.example-bar {
+}
+
+.example-bar > .bar {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--color-accent);
+}
+
+
+
+
+
+/*
+ * Slider
+ */
+
+.example-slider {
+  width: 12em;
+}
+
+.example-slider:hover {
+  background-color: var(--color-normal-hover);
+}
+
+.example-slider:active {
+  background-color: var(--color-normal-active);
+}
+
+.example-slider > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+
+.example-slider > .bar {
+  background-color: var(--color-accent);
+}
+
+.example-slider:hover > .bar {
+  background-color: var(--color-accent-hover);
+}
+
+.example-slider:active > .bar {
+  background-color: var(--color-accent-active);
+}
+
+.example-slider > .overlay {
+  width: 100%;
+}
+
+.example-slider > .overlay > * {
+  position: relative;
+  height: 100%;
+}
+
+.example-slider > .overlay > .decrease {
+  float: left;
+  padding-left: var(--padding);
+}
+
+.example-slider > .overlay > .label {
+  float: left;
+  padding-left: var(--padding);
+}
+
+.example-slider > .overlay > .increase {
+  padding-right: var(--padding);
+  float: right;
+}
+
+.example-slider > .overlay > .field {
+  float: right;
+  padding-right: var(--padding);
+  overflow: hidden;
+  white-space: nowrap;
+
+  max-width: 30%;
+}
+
+.example-slider > .overlay > * > * {
+  position: relative;
+  height: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+}
+
+
+.example-slider-tall {
+  height: calc((var(--height) * 2) - var(--border-width));
+}
+
+.example-slider-tall > .bar-container:hover {
+  background-color: var(--color-normal-hover);
+}
+
+.example-slider-tall > .bar-container:active {
+  background-color: var(--color-normal-active);
+}
+
+.example-slider-tall > .bar-container {
+  position: relative;
+  display: inline-block;
+  width: 10em;
+  height: 100%;
+  float: left;
+}
+
+.example-slider-tall > .bar-container > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+
+.example-slider-tall > .bar-container > .bar {
+  background-color: var(--color-accent);
+}
+
+.example-slider-tall > .bar-container:hover > .bar {
+  background-color: var(--color-accent-hover);
+}
+
+.example-slider-tall > .bar-container:active > .bar {
+  background-color: var(--color-accent-active);
+}
+
+.example-slider-tall > .bar-container > .overlay {
+  width: 100%;
+}
+
+.example-slider-tall > .bar-container > .overlay > * {
+  position: relative;
+  height: 100%;
+}
+
+.example-slider-tall > .bar-container > .overlay > .label {
+  float: left;
+  padding-left: var(--padding);
+}
+
+.example-slider-tall > .bar-container > .overlay > .field {
+  float: right;
+  padding-right: var(--padding);
+  max-width: 50%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.example-slider-tall > .bar-container > .overlay > * > * {
+  position: relative;
+  height: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.example-slider-tall > .controls {
+  height: 100%;
+  float: left;
+  border-left-width: var(--border-width);
+  border-left-style: solid;
+  border-left-color: var(--color-border);
+
+  box-sizing: border-box;
+  width: var(--control-width);
+}
+
+.example-slider-tall > .controls > * {
+  height: calc(50% - (var(--border-width) / 2));
+  border-bottom-width: var(--border-width);
+  border-bottom-style: solid;
+  border-bottom-color: var(--color-border);
+  display: block;
+  text-align: center;
+  padding: 0;
+}
+
+.example-slider-tall > .controls > * > * {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  vertical-align: top;
+}
+
+
+
+
+
+/*
+ * ButtonGroup
+ */
+
+.example-button-group {
+  list-style-type: none;
+  padding: 0;
+}
+
+.example-button-group > .button {
+  height: 100%;
+  float: left;
+  padding: 0 var(--padding);
+  border-right-style: solid;
+  border-right-width: var(--border-width);
+  border-right-color: var(--color-border);
+}
+
+.example-button-group > .button:last-child {
+  border-right-style: none;
+}
+
+
+
+
+
+/*
+ * SplitButton
+ */
+
+.example-split-button.dropped {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  overflow: visible;
+}
+
+.example-split-button > * {
+  height: 100%;
+}
+
+.example-split-button > ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.example-split-button > .control {
+  border-left-style: solid;
+  border-left-width: var(--border-width);
+  border-left-color: var(--color-border);
+  border-top-right-radius: calc(var(--border-radius) - var(--border-width));
+  box-sizing: border-box;
+  width: var(--control-width);
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.example-split-button > ul > .button {
+  float: left;
+  clear: left;
+  border-top-left-radius: calc(var(--border-radius) - var(--border-width));
+  border-top-right-radius: calc(var(--border-radius) - var(--border-width));
+  border-bottom-left-radius: calc(var(--border-radius) - var(--border-width));
+  height: 100%;
+  box-sizing: border-box;
+  width: 100%;
+  padding-right: calc(var(--control-width) + var(--padding));
+}
+
+.example-split-button > ul > .button ~ .button {
+  padding-right: var(--padding);
+}
+
+.example-split-button.dropped > ul > .button {
+  border-bottom-left-radius: 0;
+}
+
+.example-split-button.dropped > ul > .button ~ .button {
+  width: calc(100% + (2 * var(--border-width)));
+  height: calc(100% + var(--border-width));
+  margin-left: calc(0px - var(--border-width));
+  border-radius: 0;
+  border-style: solid solid none solid;
+  border-width: var(--border-width);
+  border-color: var(--color-border);
+  z-index: 1000;
+  position: relative;
+}
+
+.example-split-button.dropped > ul > .button:last-of-type {
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom-style: solid;
+  height: calc(100% + (2 * var(--border-width)));
+}
+
+
+
+
+
+/*
+ * DropDownList, SplitButton alternative with added functionality
+ *   to allow switching the default button dynamically
+ */
+
+.example-split-button-dynamic.dropped,
+.example-drop-down-list.dropped {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  overflow: visible;
+}
+
+.example-split-button-dynamic > *,
+.example-drop-down-list > * {
+  height: 100%;
+}
+
+.example-split-button-dynamic > ul,
+.example-drop-down-list > ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.example-split-button-dynamic > .control,
+.example-drop-down-list > .control {
+  border-left-style: solid;
+  border-left-width: var(--border-width);
+  border-left-color: var(--color-border);
+  border-top-right-radius: calc(var(--border-radius) - var(--border-width));
+  box-sizing: border-box;
+  width: var(--control-width);
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  padding: 0;
+  text-align: center;
+}
+
+.example-split-button-dynamic > ul > .button,
+.example-drop-down-list > ul > .button {
+  float: left;
+  clear: left;
+  border-top-left-radius: calc(var(--border-radius) - var(--border-width));
+  border-top-right-radius: calc(var(--border-radius) - var(--border-width));
+  border-bottom-left-radius: calc(var(--border-radius) - var(--border-width));
+  height: 100%;
+  box-sizing: border-box;
+  width: 100%;
+  height: 0;
+  visibility: hidden;
+  padding-right: calc(var(--control-width) + var(--padding));
+  z-index: 0;
+}
+
+.example-split-button-dynamic.dropped > ul > .button,
+.example-drop-down-list.dropped > ul > .button {
+  border-bottom-left-radius: 0;
+  visibility: visible;
+  height: 100%;
+}
+
+.example-split-button-dynamic.dropped > ul > .button ~ .button,
+.example-drop-down-list.dropped > ul > .button ~ .button {
+  width: calc(100% + (2 * var(--border-width)));
+  height: calc(100% + var(--border-width));
+  margin-left: calc(0px - var(--border-width));
+  border-radius: 0;
+  border-style: solid solid none solid;
+  border-width: var(--border-width);
+  border-color: var(--color-border);
+  z-index: 1000;
+  position: relative;
+}
+
+.example-split-button-dynamic:not(.dropped) > ul > .button.default,
+.example-drop-down-list:not(.dropped) > ul > .button.selected {
+  border-style: none;
+  visibility: visible;
+  height: 100%;
+}
+
+.example-drop-down-list:not(.dropped) > ul > .hint ~ .button.selected {
+  transform: translateY(-100%);
+}
+
+.example-split-button-dynamic.dropped > ul > .button:last-of-type,
+.example-drop-down-list.dropped > ul > .button:last-of-type {
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom-style: solid;
+  height: calc(100% + (2 * var(--border-width)));
+}
+
+.example-drop-down-list > ul > .hint {
+  background-color: var(--color-normal);
+  visibility: visible;
+  height: 100%;
+}
+
+
+
+
+
+/*
+ * Menu
+ */
+
+ul.example-menu {
+  list-style-type: none;
+  padding: 0;
+  height: auto;
+  display: inline-block;
+  min-width: 15em;
+}
+
+ul.example-menu > li {
+  display: block;
+  position: relative;
+  border-bottom-style: solid;
+  border-bottom-color: var(--color-border);
+  border-bottom-width: var(--border-width);
+  height: var(--height);
+}
+
+ul.example-menu > li:last-child {
+  border-bottom-style: none;
+}
+
+ul.example-menu > li *.right {
+  float: right;
+  margin-left: 3em;
+}
