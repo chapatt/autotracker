@@ -424,7 +424,7 @@ Object.assign(chapatt.TextBox,
         this.mutatedSinceSaved = true;
 
         // FIXME! if set to change on mutation
-        this.saveFieldText();
+        // this.saveFieldText();
     },
 
     saveFieldText: function() {

@@ -261,6 +261,7 @@
         var bearingSlider = chapatt.Slider.new(document.getElementById('bearing-slider'), angleUnits, 0, 360);
 
         function bearingButtonCallback(targetWidget, signalName, signalData, userData) {
+            bearingSlider.field.saveFieldText();
 /*
             rotorTargetToBearing(bearingSlider.getValueModel().getValue());
             sendBearing(bearingSlider.getValueModel().getValue());
@@ -274,6 +275,7 @@
         var headingSlider = chapatt.Slider.new(document.getElementById('heading-slider'), angleUnits, 0, 360);
 
         function headingButtonCallback(targetWidget, signalName, signalData, userData) {
+            headingSlider.field.saveFieldText();
             setHeading(headingSlider.getValueModel().getValue());
         }
         var headingButton = chapatt.Button.new(document.getElementById('heading-button'), 1);
@@ -283,6 +285,7 @@
         var negativeLimitSpinBox = chapatt.SpinBox.new(document.getElementById('negative-limit-spin-box'), angleUnits);
 
         function negativeLimitButtonCallback(targetWidget, signalName, signalData, userData) {
+            negativeLimitSpinBox.field.saveFieldText();
             negativeLimitToBearing(negativeLimitSpinBox.getValueModel().getValue());
         }
         var negativeLimitButton = chapatt.Button.new(document.getElementById('negative-limit-button'), 1);
@@ -291,6 +294,7 @@
         var positiveLimitSpinBox = chapatt.SpinBox.new(document.getElementById('positive-limit-spin-box'), angleUnits);
 
         function positiveLimitButtonCallback(targetWidget, signalName, signalData, userData) {
+            positiveLimitSpinBox.field.saveFieldText();
             positiveLimitToBearing(positiveLimitSpinBox.getValueModel().getValue());
         }
         var positiveLimitButton = chapatt.Button.new(document.getElementById('positive-limit-button'), 1);
