@@ -43,7 +43,23 @@
       min-width: fit-content;
     }
 
+    .module > .move-controls {
+      display: inline;
+      margin-bottom: 0;
+    }
+
+    .module > .move-controls > * {
+      cursor: default;
+      font-size: 0.75em;
+      color: #888;
+    }
+
+    .module > .move-controls > *:hover {
+      color: #ccc;
+    }
+
     .module > .title {
+      cursor: default;
       margin-left: calc(var(--module-border-radius) - (var(--module-border-width) / 2));
       margin-bottom: 0;
       font-size: 0.75em;
@@ -52,10 +68,18 @@
       display: inline;
     }
 
+    .module > .title:hover {
+      color: #999;
+    }
+
     .module.collapsed > .title {
       border-bottom-color: #555;
       border-bottom-style: dotted;
       border-bottom-width: 1px;
+    }
+
+    .module.collapsed > .title:hover {
+      border-bottom-color: #999;
     }
 
     .module > .content {
@@ -324,6 +348,18 @@
             title.addEventListener('click', function() {
                 module.classList.toggle("collapsed");
             });
+
+            var down = module.getElementsByClassName('move-controls')[0].getElementsByClassName('down')[0];
+            down.addEventListener('click', function() {
+                if (module.nextElementSibling)
+                    module.parentNode.insertBefore(module, module.nextElementSibling.nextElementSibling);
+            });
+
+            var up = module.getElementsByClassName('move-controls')[0].getElementsByClassName('up')[0];
+            up.addEventListener('click', function() {
+		if (module.previousElementSibling)
+                    module.parentNode.insertBefore(module, module.previousElementSibling);
+            });
         });
     });
 
@@ -570,110 +606,35 @@
          z"
     /></g>
   </svg>
-  <div id="sources" class="module collapsed">
-    <h2 class="title">Data Sources</h2>
-    <div class="content">
-      <table>
-        <tr>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Status</th>
-        </tr>
-        <tr>
-          <td>Bow</td>
-          <td>(0.5, 6)</td>
-          <td>Connected</td>
-        </tr>
-        <tr>
-          <td>Stern</td>
-          <td>(0, -12)</td>
-          <td>Connected</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-  <div class="module">
-    <h2 class="title">Relative Bearing</h2>
-    <div class="content">
-      <div style="margin-bottom: 0.5em">
-        <ul id="toggle-button-group-1" class="example-widget example-button-group">
-          <li class="example-button example-toggle-button button">
-            <div>Auto</div>
-          </li>
-          <li class="example-button example-toggle-button button selected">
-            <div>Manual</div>
-          </li>
-        </ul>
+  <ol id="modules">
+    <li id="sources" class="module collapsed">
+      <h2 class="title">Data Sources</h2>
+      <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>
+      <div class="content">
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>Bow</td>
+            <td>(0.5, 6)</td>
+            <td>Connected</td>
+          </tr>
+          <tr>
+            <td>Stern</td>
+            <td>(0, -12)</td>
+            <td>Connected</td>
+          </tr>
+        </table>
       </div>
-      <div>
-        <div id="bearing-slider" class="example-widget example-slider" style="margin-right: 0.25em">
-          <div class="bar" style="width: 50%;"></div>
-          <div class="overlay">
-            <div class="decrease">
-              <div style="font-size: 0.6em;">&#x25c0;</div>
-            </div>
-            <div class="label">
-              <div>Bearing:</div>
-            </div>
-            <div class="increase">
-              <div style="font-size: 0.6em;">&#x25b6;</div>
-            </div>
-            <div class="field">
-              <div contenteditable="true">180 deg</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="bearing-button" class="example-widget example-button">
-          <div>Rotate</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="module">
-    <h2 class="title">Heading</h2>
-    <div class="content">
-      <div style="margin-bottom: 0.5em">
-        <ul id="toggle-button-group-1" class="example-widget example-button-group">
-          <li class="example-button example-toggle-button button">
-            <div>Auto</div>
-          </li>
-          <li class="example-button example-toggle-button button selected">
-            <div>Manual</div>
-          </li>
-        </ul>
-      </div>
-      <div>
-        <div id="heading-slider" class="example-widget example-slider" style="margin-right: 0.25em">
-          <div class="bar" style="width: 50%;"></div>
-          <div class="overlay">
-            <div class="decrease">
-              <div style="font-size: 0.6em;">&#x25c0;</div>
-            </div>
-            <div class="label">
-              <div>Heading:</div>
-            </div>
-            <div class="increase">
-              <div style="font-size: 0.6em;">&#x25b6;</div>
-            </div>
-            <div class="field">
-              <div contenteditable="true">180 deg</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="heading-button" class="example-widget example-button">
-          <div>Steer</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="module collapsed">
-    <h2 class="title">Location</h2>
-    <div class="content">
-      <div class="section">
+    </li>
+    <li class="module">
+      <h2 class="title">Relative Bearing</h2>
+      <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>
+      <div class="content">
         <div style="margin-bottom: 0.5em">
-          <div class="heading">Rotor</div>
           <ul id="toggle-button-group-1" class="example-widget example-button-group">
             <li class="example-button example-toggle-button button">
               <div>Auto</div>
@@ -684,73 +645,155 @@
           </ul>
         </div>
         <div>
+          <div id="bearing-slider" class="example-widget example-slider" style="margin-right: 0.25em">
+            <div class="bar" style="width: 50%;"></div>
+            <div class="overlay">
+              <div class="decrease">
+                <div style="font-size: 0.6em;">&#x25c0;</div>
+              </div>
+              <div class="label">
+                <div>Bearing:</div>
+              </div>
+              <div class="increase">
+                <div style="font-size: 0.6em;">&#x25b6;</div>
+              </div>
+              <div class="field">
+                <div contenteditable="true">180 deg</div>
+              </div>
+            </div>
+          </div>
+  
+          <div id="bearing-button" class="example-widget example-button">
+            <div>Rotate</div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li class="module">
+      <h2 class="title">Heading</h2>
+      <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>
+      <div class="content">
+        <div style="margin-bottom: 0.5em">
+          <ul id="toggle-button-group-1" class="example-widget example-button-group">
+            <li class="example-button example-toggle-button button">
+              <div>Auto</div>
+            </li>
+            <li class="example-button example-toggle-button button selected">
+              <div>Manual</div>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div id="heading-slider" class="example-widget example-slider" style="margin-right: 0.25em">
+            <div class="bar" style="width: 50%;"></div>
+            <div class="overlay">
+              <div class="decrease">
+                <div style="font-size: 0.6em;">&#x25c0;</div>
+              </div>
+              <div class="label">
+                <div>Heading:</div>
+              </div>
+              <div class="increase">
+                <div style="font-size: 0.6em;">&#x25b6;</div>
+              </div>
+              <div class="field">
+                <div contenteditable="true">180 deg</div>
+              </div>
+            </div>
+          </div>
+  
+          <div id="heading-button" class="example-widget example-button">
+            <div>Steer</div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li class="module collapsed">
+      <h2 class="title">Location</h2>
+      <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>
+      <div class="content">
+        <div class="section">
+          <div style="margin-bottom: 0.5em">
+            <div class="heading">Rotor</div>
+            <ul id="toggle-button-group-1" class="example-widget example-button-group">
+              <li class="example-button example-toggle-button button">
+                <div>Auto</div>
+              </li>
+              <li class="example-button example-toggle-button button selected">
+                <div>Manual</div>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div id="text-box-1" class="example-widget example-text-box" style="width: 15em; margin-right: 0.25em">
+              <div class="field">
+                <div contenteditable="true"></div>
+                <div class="hint">coordinates</div>
+              </div>
+            </div>
+  
+            <div id="button-1" class="example-widget example-button">
+              <div>Move</div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="heading">Target:</div>
           <div id="text-box-1" class="example-widget example-text-box" style="width: 15em; margin-right: 0.25em">
             <div class="field">
               <div contenteditable="true"></div>
               <div class="hint">coordinates</div>
             </div>
           </div>
-
+  
           <div id="button-1" class="example-widget example-button">
             <div>Move</div>
           </div>
         </div>
       </div>
-      <div class="section">
-        <div class="heading">Target:</div>
-        <div id="text-box-1" class="example-widget example-text-box" style="width: 15em; margin-right: 0.25em">
-          <div class="field">
-            <div contenteditable="true"></div>
-            <div class="hint">coordinates</div>
+    </li>
+    <li class="module">
+      <h2 class="title">Limits</h2>
+      <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>
+      <div class="content">
+        <div class="section">
+          <div class="heading">CCW</div>
+          <div id="negative-limit-spin-box" class="example-widget example-spin-box" style="margin-right: 0.25em">
+            <div class="decrease">
+              <div style="font-size: 0.6em;">&#x25c0;</div>
+            </div>
+            <div class="field">
+              <div contenteditable="true">180 deg</div>
+            </div>
+            <div class="increase">
+              <div style="font-size: 0.6em;">&#x25b6;</div>
+            </div>
+          </div>
+  
+          <div id="negative-limit-button" class="example-widget example-button">
+            <div>Set</div>
           </div>
         </div>
-
-        <div id="button-1" class="example-widget example-button">
-          <div>Move</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="module">
-    <h2 class="title">Limits</h2>
-    <div class="content">
-      <div class="section">
-        <div class="heading">CCW</div>
-        <div id="negative-limit-spin-box" class="example-widget example-spin-box" style="margin-right: 0.25em">
-          <div class="decrease">
-            <div style="font-size: 0.6em;">&#x25c0;</div>
+        <div class="section">
+          <div class="heading">CW</div>
+          <div id="positive-limit-spin-box" class="example-widget example-spin-box" style="margin-right: 0.25em">
+            <div class="decrease">
+              <div style="font-size: 0.6em;">&#x25c0;</div>
+            </div>
+            <div class="field">
+              <div contenteditable="true">180 deg</div>
+            </div>
+            <div class="increase">
+              <div style="font-size: 0.6em;">&#x25b6;</div>
+            </div>
           </div>
-          <div class="field">
-            <div contenteditable="true">180 deg</div>
+  
+          <div id="positive-limit-button" class="example-widget example-button">
+            <div>Set</div>
           </div>
-          <div class="increase">
-            <div style="font-size: 0.6em;">&#x25b6;</div>
-          </div>
-        </div>
-
-        <div id="negative-limit-button" class="example-widget example-button">
-          <div>Set</div>
-        </div>
-      </div>
-      <div class="section">
-        <div class="heading">CW</div>
-        <div id="positive-limit-spin-box" class="example-widget example-spin-box" style="margin-right: 0.25em">
-          <div class="decrease">
-            <div style="font-size: 0.6em;">&#x25c0;</div>
-          </div>
-          <div class="field">
-            <div contenteditable="true">180 deg</div>
-          </div>
-          <div class="increase">
-            <div style="font-size: 0.6em;">&#x25b6;</div>
-          </div>
-        </div>
-
-        <div id="positive-limit-button" class="example-widget example-button">
-          <div>Set</div>
         </div>
       </div>
-    </div>
-  </div>
+    </li>
+  </ol>
 </body>
 </html>
