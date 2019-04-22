@@ -119,6 +119,7 @@
 
     #sources > .content table td, #sources > .content table th {
       padding: 0 1em 0 0;
+      vertical-align: middle;
     }
 
     #sources > .content table td:last-child, #sources > .content table th:last-child {
@@ -133,6 +134,12 @@
       border-bottom-width: 1px;
       border-bottom-color: #ccc;
       color: #555;
+    }
+
+    #sources > .content table td:nth-child(4),
+    #sources > .content table td:nth-child(5),
+    #sources > .content table td:nth-child(6) {
+      text-align: center;
     }
 
     #rotor {
@@ -266,8 +273,8 @@
         });
 
         var toggleButtonGroup1 = chapatt.ToggleButtonGroup.new(document.getElementById('toggle-button-group-1'));
-            toggleButtonGroup1.valueModel.signalConnect('valueChanged', function(targetWidget, signalName, signalData, userData) {
-                console.log('toggle-button-group-1: valueChanged from ' + toggleButtonGroup1.valueModel.getValue() + ' to ' + signalData);
+        toggleButtonGroup1.valueModel.signalConnect('valueChanged', function(targetWidget, signalName, signalData, userData) {
+            console.log('toggle-button-group-1: valueChanged from ' + toggleButtonGroup1.valueModel.getValue() + ' to ' + signalData);
         });
 
         var angleUnits = [
@@ -323,6 +330,11 @@
         }
         var positiveLimitButton = chapatt.Button.new(document.getElementById('positive-limit-button'), 1);
         positiveLimitButton.signalConnect('clicked', positiveLimitButtonCallback, null);
+
+        var bearingCheckbox = chapatt.ToggleButton.new(document.getElementById('bearing-checkbox'));
+        bearingCheckbox.valueModel.signalConnect('valueChanged', function(targetWidget, signalName, signalData, userData) {
+            console.log('bearing-checkbox: valueChanged from ' + bearingCheckbox.valueModel.getValue() + ' to ' + signalData);
+        });
     });
   </script>
 
@@ -616,11 +628,23 @@
             <th>Name</th>
             <th>Position</th>
             <th>Status</th>
+            <th>Bearing</th>
+            <th>Heading</th>
+            <th>Location</th>
           </tr>
           <tr>
             <td>Bow</td>
             <td>(0.5, 6)</td>
             <td>Connected</td>
+            <td>
+              <div id="bearing-checkbox" class="example-widget example-button example-toggle-button example-checkbox"></div>
+            </td>
+            <td>
+              <div id="heading-checkbox" class="example-widget example-button example-toggle-button example-checkbox"></div>
+            </td>
+            <td>
+              <div id="location-checkbox" class="example-widget example-button example-toggle-button example-checkbox"></div>
+            </td>
           </tr>
           <tr>
             <td>Stern</td>

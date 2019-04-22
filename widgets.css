@@ -125,6 +125,21 @@
 
 
 /*
+ * Checkbox
+ */
+
+.example-checkbox {
+  border-radius: 0.15em;
+  height: 0.75em;
+  width: 0.75em;
+  padding: 0;
+}
+
+
+
+
+
+/*
  * SpinBox
  */
 
