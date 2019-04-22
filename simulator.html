@@ -262,8 +262,8 @@
     }
   </style>
 
-  <link rel="stylesheet" type="text/css" href="./widgets.css" />
-  <script type="text/javascript" src="./widgets.js"></script>
+  <link rel="stylesheet" type="text/css" href="./chapatt-webtk/example.css" />
+  <script type="text/javascript" src="./chapatt-webtk/chapatt-webtk.js"></script>
 
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
@@ -290,6 +290,10 @@
 
         /* Bearing */
         var bearingSlider = chapatt.Slider.new(document.getElementById('bearing-slider'), angleUnits, 0, 360);
+        bearingSlider.scrollPixelsPerUnit = 50;
+        bearingSlider.mousemovePixelsPerUnit = 10;
+        var integralConstraint = chapatt.IntegralConstraint.new();
+        bearingSlider.getValueModel().insertConstraintBefore(integralConstraint, bearingSlider.getValueModel().boundedConstraint);
 
         function bearingButtonCallback(targetWidget, signalName, signalData, userData) {
             bearingSlider.field.saveFieldText();
@@ -304,6 +308,10 @@
 
         /* Heading */
         var headingSlider = chapatt.Slider.new(document.getElementById('heading-slider'), angleUnits, 0, 360);
+        headingSlider.scrollPixelsPerUnit = 50;
+        headingSlider.mousemovePixelsPerUnit = 10;
+        var integralConstraint = chapatt.IntegralConstraint.new();
+        headingSlider.getValueModel().insertConstraintBefore(integralConstraint, headingSlider.getValueModel().boundedConstraint);
 
         function headingButtonCallback(targetWidget, signalName, signalData, userData) {
             headingSlider.field.saveFieldText();
@@ -314,6 +322,10 @@
 
         /* CCW Limit */
         var negativeLimitSpinBox = chapatt.SpinBox.new(document.getElementById('negative-limit-spin-box'), angleUnits);
+        negativeLimitSpinBox.scrollPixelsPerUnit = 50;
+        negativeLimitSpinBox.mousemovePixelsPerUnit = 10;
+        var integralConstraint = chapatt.IntegralConstraint.new();
+        negativeLimitSpinBox.getValueModel().insertConstraintBefore(integralConstraint, negativeLimitSpinBox.getValueModel().boundedConstraint);
 
         function negativeLimitButtonCallback(targetWidget, signalName, signalData, userData) {
             negativeLimitSpinBox.field.saveFieldText();
@@ -323,6 +335,10 @@
         negativeLimitButton.signalConnect('clicked', negativeLimitButtonCallback, null);
 
         var positiveLimitSpinBox = chapatt.SpinBox.new(document.getElementById('positive-limit-spin-box'), angleUnits);
+        positiveLimitSpinBox.scrollPixelsPerUnit = 50;
+        positiveLimitSpinBox.mousemovePixelsPerUnit = 10;
+        var integralConstraint = chapatt.IntegralConstraint.new();
+        positiveLimitSpinBox.getValueModel().insertConstraintBefore(integralConstraint, positiveLimitSpinBox.getValueModel().boundedConstraint);
 
         function positiveLimitButtonCallback(targetWidget, signalName, signalData, userData) {
             positiveLimitSpinBox.field.saveFieldText();

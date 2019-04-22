@@ -1,0 +1,3 @@
+[submodule "chapatt-webtk"]
+	path = chapatt-webtk
+	url = https://github.com/chapatt/chapatt-webtk
