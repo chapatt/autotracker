@@ -7,7 +7,7 @@ class HomeSensor
   PIN_HOME = 12
 
   def initialize
-    GPIO::setup PIN_HOME, with_direction: GPIO::DIRECTION_INPUT
+    GPIO::setup PIN_HOME, GPIO::TYPE_GPIO, { direction => GPIO::DIRECTION_INPUT }
 
     self.watch
 
