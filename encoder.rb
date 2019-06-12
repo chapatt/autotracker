@@ -4,7 +4,7 @@ require_relative 'gpio.rb'
 class Encoder
   include Singleton
 
-  PIN_ENC = 21
+  PIN_ENC = 27
   CYCLES_PER_REV = 360
 
   attr_accessor :direction, # Until initialized @position will not change
@@ -15,7 +15,7 @@ class Encoder
     @position = 0
     @callback_mutex = Mutex.new
 
-    GPIO::setup PIN_ENC, with_direction: GPIO::DIRECTION_INPUT
+    GPIO::setup PIN_ENC, GPIO::TYPE_GPIO, { :direction => GPIO::DIRECTION_INPUT }
 
     self.watch
 

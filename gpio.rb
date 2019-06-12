@@ -14,6 +14,9 @@ module GPIO
   STATE_LOW  = '0'
   STATE_HIGH = '1'
 
+  GPIO::TYPE_GPIO = 0
+  GPIO::TYPE_PWM =  1
+
   # GPIO::TYPE_GPIO
   # :frequency in Hz, :duty_cycle in fraction of whole
   #
@@ -21,7 +24,7 @@ module GPIO
   # :direction either DIRECTION_INPUT or DIRECTION_OUTPUT
   # :active_low either true or false
   def self.setup pin, type, params={}
-    if type == self.class::TYPE_PWM
+    if type == self::TYPE_PWM
       File.binwrite '/sys/class/pwm/pwmchip0/export', pin.to_s
       # Retry a few time until files appear
       retries = 0
@@ -34,7 +37,7 @@ module GPIO
         retries += 1
         retry
       end
-    elsif type == self.class::TYPE_GPIO
+    elsif type == self::TYPE_GPIO
       File.binwrite '/sys/class/gpio/export', pin.to_s
       # retry a few time until files appear
       retries = 0
@@ -90,12 +93,12 @@ module GPIO
     end
   end
 
-  def self.set_pwm_frequency pin frequency
+  def self.set_pwm_frequency pin, frequency
     period = 1000000000 / frequency
     File.binwrite "/sys/class/pwm/pwm#{pin}/period", period
   end
 
-  def self.set_pwm_duty_cycle pin duty_cycle
+  def self.set_pwm_duty_cycle pin, duty_cycle
     duty_length = period * duty_cycle
     File.binwrite "/sys/class/pwm/pwm#{pin}/duty_cycle", duty_cycle
   end

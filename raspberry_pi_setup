@@ -1,0 +1,40 @@
+#
+# ZeroMQ
+#
+
+sudo apt install libtool pkg-config build-essential autoconf automake ruby-dev libavahi-compat-libdnssd-dev
+
+wget https://github.com/zeromq/libzmq/releases/download/v4.3.1/zeromq-4.3.1.tar.gz
+tar xvf zeromq-4.3.1.tar.gz
+cd zeromq-4.3.1/
+./configure
+make
+sudo make install
+sudo ldconfig
+
+sudo gem install --no-user-install ffi-rzmq
+
+
+#
+# mDNS & DNS-SD zeroconf
+#
+
+sudo apt install libnss-resolve libavahi-compat-libdnssd-dev
+sudo gem install --no-user-install dnssd
+
+
+#
+# NMEA
+#
+
+sudo gem install --no-user-install nmea_plus
+
+
+#
+# PWM
+#
+
+# Add line to /boot/config.txt:
+dtoverlay=pwm-2chan # defaults of PWM0 on GPIO18 and PWM1 on GPIO19
+dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4 # PWM0 on GPIO12 and PWM1 on GPIO13
+dtoverlay=pwm,pin=19,func=2 # PWM1 on GPIO19

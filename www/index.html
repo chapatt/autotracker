@@ -30,17 +30,21 @@
       --blue: #aae;
       --module-border-width: 0.25rem;
       --module-border-radius: 0.75rem;
+      --rotor-size: 540px;
 
       font-family: sans-serif;
       padding: 0.5rem;
       margin: 0;
     }
 
+    #modules {
+      list-style-type: none;
+    }
+
     .module {
       margin-bottom: 0.5rem;
       box-sizing: border-box;
-      overflow: hidden;
-      min-width: fit-content;
+      float: left;
     }
 
     .module > .move-controls {
@@ -142,11 +146,14 @@
       text-align: center;
     }
 
-    #rotor {
+    #rotor-module {
       float: left;
-      width: 540px;
-      height: 540px;
-      margin-right: 0.5rem;
+      display: inline-block;
+    }
+
+    #rotor {
+      width: var(--rotor-size);
+      height: var(--rotor-size);
     }
 
     #rotor text {
@@ -265,14 +272,19 @@
   <link rel="stylesheet" type="text/css" href="./chapatt-webtk/example.css" />
   <script type="text/javascript" src="./chapatt-webtk/chapatt-webtk.js"></script>
 
+  <script type="text/javascript" src="./jquery.min.js"></script>
+  <script type="text/javascript" src="./masonry.pkgd.min.js"></script>
+
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
+        var dropDownList1 = chapatt.DropDownList.new(document.getElementById('drop-down-list-1'), [0, 0, 0]);
+
         var textBox1 = chapatt.TextBox.new(document.getElementById('text-box-1'));
         textBox1.getValueModel().signalConnect('valueChanged', function() {
             console.log('text-box-1: valueChanged');
         });
 
-        var toggleButtonGroup1 = chapatt.ToggleButtonGroup.new(document.getElementById('toggle-button-group-1'));
+        var toggleButtonGroup1 = chapatt.ToggleButtonGroup.new(document.getElementById('toggle-button-group-1'), [0, 1]);
         toggleButtonGroup1.valueModel.signalConnect('valueChanged', function(targetWidget, signalName, signalData, userData) {
             console.log('toggle-button-group-1: valueChanged from ' + toggleButtonGroup1.valueModel.getValue() + ' to ' + signalData);
         });
@@ -359,7 +371,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         try {
-            ws = new WebSocket("ws://" + window.location.hostname + ":2345");
+            ws = new WebSocket('ws://' + window.location.hostname + ':' + window.location.port);
         } catch (error) {
             console.error(error);
         }
@@ -375,20 +387,57 @@
             var title = module.getElementsByClassName('title')[0];
             title.addEventListener('click', function() {
                 module.classList.toggle("collapsed");
+/*
+                layoutModules();
+*/
             });
 
             var down = module.getElementsByClassName('move-controls')[0].getElementsByClassName('down')[0];
             down.addEventListener('click', function() {
                 if (module.nextElementSibling)
                     module.parentNode.insertBefore(module, module.nextElementSibling.nextElementSibling);
+/*
+                    layoutModules();
+*/
             });
 
             var up = module.getElementsByClassName('move-controls')[0].getElementsByClassName('up')[0];
             up.addEventListener('click', function() {
 		if (module.previousElementSibling)
                     module.parentNode.insertBefore(module, module.previousElementSibling);
+/*
+                    layoutModules();
+*/
             });
         });
+
+        var layoutModules = function() {
+            var modules = Array.from(document.getElementsByClassName('module'));
+            var rotorModule = document.getElementById('rotor-module');
+            var rotorRightMargin = document.documentElement.clientWidth - rotorModule.offsetWidth;
+            modules.forEach(function(module) {
+                module.style.width = "auto";
+                var moduleTop;
+                if ((moduleTop = module.getBoundingClientRect().top) < rotorModule.getBoundingClientRect().bottom) {
+                    module.getElementsByClassName('content')[0].style.borderColor = 'red';
+                    var testModuleWidth;
+                    var moduleWidth = module.offsetWidth;
+                    var i = 1;
+                    while (module.offsetWidth < (testModuleWidth = (rotorRightMargin / i))) {
+                        moduleWidth = testModuleWidth;
+                        ++i;
+                    }
+                    console.log(moduleWidth);
+                    module.style.boxSizing = 'border-box';
+                    module.style.width = moduleWidth + 'px';
+                } else {
+                    module.getElementsByClassName('content')[0].style.borderColor = 'blue';
+                }
+            });
+        }
+/*
+        layoutModules();
+*/
     });
 
     Number.prototype.coterminalInTurn = function(turn, base=360) {
@@ -482,159 +531,186 @@
   </script>
 </head>
 <body>
-  <svg
-    id="rotor"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    width="540"
-    height="540"
-  >
-    <defs>
-      <!-- start node x = (55 * cos(pi * 0.34)) = 26.49645 -->
-      <!-- node y = -(55 * sin(pi * 0.34)) = -48.19687 -->
-      <!-- end node x = (55 * cos(pi * 0.66)) = -26.49645 -->
-      <path
-        id="target-bearing-window"
-        d="m 26.49645 -48.19687
-           A 55 55 0 0 0 -26.49645 -48.1968"
-        stroke-width="27"
-      />
-      <g id="limit-symbol">
-        <path
-          class="arrow"
-          d="m 10 -220
-             l -10 10
-             l 10 10
-             z"
-        />
-        <rect
-          class="bar"
-          x="-5"
-          y="-220"
-          width="5"
-          height="20"
-        />
-      </g>
-      <path
-        id="coordinate-path"
-        transform="translate(270 270)"
-        d="m -200 0
-           A 200 200 0 0 0 200 0"
-      />
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
-        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
-        <feMerge>
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
-    <circle
-      id="circle"
-      cx="270"
-      cy="270"
-      r="210"
-    />
-    <!-- 70 * tan(60deg.) = 121.243557 -->
-    <!-- 20 * cos(30deg.) = 17.32051 -->
-    <!-- 25 + 17.32051 = 42.32051 -->
-    <!-- 121.243557 + 17.32051 + 10 = 148.56406 -->
-    <!-- 70 + 17.32051 = 87.32051 -->
-    <g id="arrow-target"><g transform="translate(270 270)">
-      <path
-        d="m -45 -60
-           v 150
-           h 90
-           v -150
-           h 42.32051
-           l -87.32051 -148.56406
-           l -87.32051 148.56406
-           z"
-      />
-      <text x="0" y="-50" text-anchor="middle">0°</text>
-    </g></g>
-    <text text-anchor="start" id="rotor-coordinates" class="coordinates">
-      <textPath xlink:href="#coordinate-path">
-        37°28′14″N -70°65′91″W
-      </textPath>
-    </text>
-    <text text-anchor="end" id="target-coordinates" class="coordinates">
-      <textPath xlink:href="#coordinate-path" startOffset="100%">
-        37°28′14″N -70°65′91″W
-      </textPath>
-    </text>
-    <g id="arrow"><g transform="translate(270 270)">
-      <mask id="target-bearing-window-mask">
-        <rect x="-50%" y="-50%" width="100%" height="100%" fill="white" />
-        <use
-          xlink:href="#target-bearing-window"
-          stroke="black"
-        />
-        <use
-          xlink:href="#target-bearing-window"
-          stroke="black"
-          transform="rotate(180 0 0)"
-        />
-      </mask>
-      <path
-        d="m -35 -70
-           v 150
-           h 70
-           v -150
-           h 35
-           l -70 -121.243557
-           l -70 121.243557
-           z"
-        mask="url(#target-bearing-window-mask)"
-      />
-      <text x="0" y="-80" text-anchor="middle">0°</text>
-    </g></g>
-    <g id="negative-limit" class="limit"><g transform="translate(270 270)">
-      <use xlink:href="#limit-symbol" class="symbol" />
-      <rect
-        class="box"
-        x="-25"
-        y="-225"
-        width="20"
-        height="30"
-        rx="10"
-        ry="10"
-      />
-      <text x="-10" y="-205" text-anchor="end">0°</text>
-    </g></g>
-    <g id="positive-limit" class="limit"><g transform="translate(270 270)">
-      <use xlink:href="#limit-symbol" class="symbol" transform="scale(-1 1)" />
-      <rect
-        class="box"
-        x="5"
-        y="-225"
-        width="20"
-        height="30"
-        rx="10"
-        ry="10"
-      />
-      <text x="10" y="-205" text-anchor="start">0°</text>
-    </g></g>
-    <!-- (40 - x) ^ 2 + 14 ^ 2 = ((14 / 8) * x)^2 -->
-    <!-- x = (-640 / 33) + ((56 sqrt(433)) / 33) = 15.91771 -->
-    <!-- 40 - 15.91771 = 24.08229 -->
-    <g id="n"><path
-      transform="translate(270 270)"
-      d="m -15 -225
-         v -40
-         h 8
-         l 14,24.08229
-         v -24.08229
-         h 8
-         v 40
-         h -8
-         l -14,-24.08229
-         v 24.08229
-         z"
-    /></g>
-  </svg>
   <ol id="modules">
+    <li id="rotor-module">
+      <svg
+        id="rotor"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="540"
+        height="540"
+      >
+        <defs>
+          <!-- start node x = (55 * cos(pi * 0.34)) = 26.49645 -->
+          <!-- node y = -(55 * sin(pi * 0.34)) = -48.19687 -->
+          <!-- end node x = (55 * cos(pi * 0.66)) = -26.49645 -->
+          <path
+            id="target-bearing-window"
+            d="m 26.49645 -48.19687
+               A 55 55 0 0 0 -26.49645 -48.1968"
+            stroke-width="27"
+          />
+          <g id="limit-symbol">
+            <path
+              class="arrow"
+              d="m 10 -220
+                 l -10 10
+                 l 10 10
+                 z"
+            />
+            <rect
+              class="bar"
+              x="-5"
+              y="-220"
+              width="5"
+              height="20"
+            />
+          </g>
+          <path
+            id="coordinate-path"
+            transform="translate(270 270)"
+            d="m -200 0
+               A 200 200 0 0 0 200 0"
+          />
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
+            <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <circle
+          id="circle"
+          cx="270"
+          cy="270"
+          r="210"
+        />
+        <!-- 70 * tan(60deg.) = 121.243557 -->
+        <!-- 20 * cos(30deg.) = 17.32051 -->
+        <!-- 25 + 17.32051 = 42.32051 -->
+        <!-- 121.243557 + 17.32051 + 10 = 148.56406 -->
+        <!-- 70 + 17.32051 = 87.32051 -->
+        <g id="arrow-target"><g transform="translate(270 270)">
+          <path
+            d="m -45 -60
+               v 150
+               h 90
+               v -150
+               h 42.32051
+               l -87.32051 -148.56406
+               l -87.32051 148.56406
+               z"
+          />
+          <text x="0" y="-50" text-anchor="middle">0°</text>
+        </g></g>
+        <text text-anchor="start" id="rotor-coordinates" class="coordinates">
+          <textPath xlink:href="#coordinate-path">
+            37°28′14″N -70°65′91″W
+          </textPath>
+        </text>
+        <text text-anchor="end" id="target-coordinates" class="coordinates">
+          <textPath xlink:href="#coordinate-path" startOffset="100%">
+            37°28′14″N -70°65′91″W
+          </textPath>
+        </text>
+        <g id="arrow"><g transform="translate(270 270)">
+          <mask id="target-bearing-window-mask">
+            <rect x="-50%" y="-50%" width="100%" height="100%" fill="white" />
+            <use
+              xlink:href="#target-bearing-window"
+              stroke="black"
+            />
+            <use
+              xlink:href="#target-bearing-window"
+              stroke="black"
+              transform="rotate(180 0 0)"
+            />
+          </mask>
+          <path
+            d="m -35 -70
+               v 150
+               h 70
+               v -150
+               h 35
+               l -70 -121.243557
+               l -70 121.243557
+               z"
+            mask="url(#target-bearing-window-mask)"
+          />
+          <text x="0" y="-80" text-anchor="middle">0°</text>
+        </g></g>
+        <g id="negative-limit" class="limit"><g transform="translate(270 270)">
+          <use xlink:href="#limit-symbol" class="symbol" />
+          <rect
+            class="box"
+            x="-25"
+            y="-225"
+            width="20"
+            height="30"
+            rx="10"
+            ry="10"
+          />
+          <text x="-10" y="-205" text-anchor="end">0°</text>
+        </g></g>
+        <g id="positive-limit" class="limit"><g transform="translate(270 270)">
+          <use xlink:href="#limit-symbol" class="symbol" transform="scale(-1 1)" />
+          <rect
+            class="box"
+            x="5"
+            y="-225"
+            width="20"
+            height="30"
+            rx="10"
+            ry="10"
+          />
+          <text x="10" y="-205" text-anchor="start">0°</text>
+        </g></g>
+        <!-- (40 - x) ^ 2 + 14 ^ 2 = ((14 / 8) * x)^2 -->
+        <!-- x = (-640 / 33) + ((56 sqrt(433)) / 33) = 15.91771 -->
+        <!-- 40 - 15.91771 = 24.08229 -->
+        <g id="n"><path
+          transform="translate(270 270)"
+          d="m -15 -225
+             v -40
+             h 8
+             l 14,24.08229
+             v -24.08229
+             h 8
+             v 40
+             h -8
+             l -14,-24.08229
+             v 24.08229
+             z"
+        /></g>
+      </svg>
+    </li>
+    <li id="sources" class="module">
+      <h2 class="title">Positioner</h2>
+      <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>
+      <div class="content">
+        <div id="drop-down-list-1" class="example-widget example-drop-down-list" tabindex="-1">
+          <div class="control example-button">
+            <div style="font-size: 0.6em;">&#x25bc;</div>
+          </div>
+          <ul class="items">
+            <li class="hint button example-button">
+              <div>Choose Positioner</div>
+            </li>
+            <li class="button example-button example-toggle-button">
+              <div>choice1</div>
+            </li>
+            <li class="button example-button example-toggle-button">
+              <div>choice2</div>
+            </li>
+            <li class="button example-button example-toggle-button">
+              <div>choice3asdfjkl;</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </li>
     <li id="sources" class="module collapsed">
       <h2 class="title">Data Sources</h2>
       <div class="move-controls"><span class="down">&#x25bc;</span><span class="up">&#x25b2;</span></div>

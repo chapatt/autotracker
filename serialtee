@@ -1,0 +1,22 @@
+Create file /etc/systemd/system/serialtee.service":
+ [Unit]
+ Description=
+ StopWhenUnneeded=yes
+
+ [Service]
+ ExecStart=/bin/bash -c "/usr/bin/mkfifo /dev/ttyS0f0 /dev/ttyS0f1 && \
+           /bin/chown root:dialout /dev/ttyS0f0 /dev/ttyS0f1 && \
+           /bin/chmod 660 /dev/ttyS0f0 /dev/ttyS0f1 && \
+           (/usr/bin/tail -f /dev/null < /dev/ttyS0f0 &) && \
+           (/usr/bin/tail -f /dev/null < /dev/ttyS0f1 &) && \
+           /usr/bin/latesttee /dev/ttyS0f0 /dev/ttyS0f1 < /dev/ttyS0"
+ ExecStop=/bin/rm /dev/ttyS0f0 /dev/ttyS0f1
+ Restart=always
+
+Reload units:
+ systemctl daemon-reload
+
+Create file /etc/udev/rules.d/90-usbgetty.rules:
+ ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyS0", TAG+="systemd", ENV{SYSTEMD_WANTS}="serialtee.service"
+Reload udev rules:
+ udevadm control --reload-rules
