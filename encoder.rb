@@ -5,10 +5,14 @@ class Encoder
   include Singleton
 
   PIN_ENC = 27
+  PIN_DIR = 17
   CYCLES_PER_REV = 360
 
-  attr_accessor :direction, # Until initialized @position will not change
-                :position
+  DIR_CW =  1
+  DIR_CCW = 1
+
+  attr_accessor :position,
+                :direction
 
   def initialize
     @callbacks = Hash.new
@@ -16,6 +20,7 @@ class Encoder
     @callback_mutex = Mutex.new
 
     GPIO::setup PIN_ENC, GPIO::TYPE_GPIO, { :direction => GPIO::DIRECTION_INPUT }
+    GPIO::setup PIN_DIR, GPIO::TYPE_GPIO, { :direction => GPIO::DIRECTION_INPUT }
 
     self.watch
 
@@ -25,6 +30,10 @@ class Encoder
         end
         GPIO::cleanup PIN_ENC
     }
+  end
+
+  def self.direction
+      GPIO::read_state PIN_DIR
   end
 
   # Block should return false to delete callback
@@ -38,6 +47,11 @@ class Encoder
   end
 
   def stop_watching
+    if @dir_poll_thread
+      @dir_poll_thread.exit
+    end
+    @dir_poll_thread = nil
+
     if @enc_poll_thread
       @enc_poll_thread.exit
     end
@@ -45,15 +59,25 @@ class Encoder
   end
 
   def watch
+    if @dir_poll_thread
+      raise
+    end
+
+    @dir_poll_thread = Thread.new do
+      GPIO::watch PIN_DIR, on: GPIO::EDGE_BOTH do
+        @direction = GPIO::read PIN_DIR
+      end
+    end
+
     if @enc_poll_thread
       raise
     end
 
     @enc_poll_thread = Thread.new do
-      GPIO::watch 21, on: GPIO::EDGE_FALLING do
-        if @direction == :clockwise
+      GPIO::watch PIN_ENC, on: GPIO::EDGE_FALLING do
+        if @direction == DIR_CW
           @position += 1
-        elsif @direction == :counterclockwise
+        elsif @direction == DIR_CCW
           @position -= 1
         end
 

@@ -38,3 +38,17 @@ sudo gem install --no-user-install nmea_plus
 dtoverlay=pwm-2chan # defaults of PWM0 on GPIO18 and PWM1 on GPIO19
 dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4 # PWM0 on GPIO12 and PWM1 on GPIO13
 dtoverlay=pwm,pin=19,func=2 # PWM1 on GPIO19
+
+
+#
+# HTTP
+#
+
+sudo gem install --no-user-install rack thin
+
+
+#
+# WebSockets
+#
+
+sudo gem install --no-user-install faye-websocket

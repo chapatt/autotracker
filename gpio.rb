@@ -85,6 +85,10 @@ module GPIO
     File.binwrite "/sys/class/gpio/gpio#{pin}/value", state.to_s
   end
   
+  def self.read_state pin
+    File.binread "/sys/class/gpio/gpio#{pin}/value"
+  end
+  
   def self.cleanup pin
     if File.exist?("/sys/class/pwm/pwm#{pin}")
       File.binwrite '/sys/class/pwm/pwmchip0/unexport', pin.to_s

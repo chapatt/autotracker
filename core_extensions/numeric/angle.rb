@@ -15,14 +15,14 @@ module CoreExtensions
       end
     
       def coterminalClosestTo angle, withBase: 360
-        turn = angle.turn withBase: base
+        turn = angle.turn withBase: withBase
         same_turn = self.coterminalInTurn turn, withBase: withBase
         difference = same_turn - angle
         if difference.abs > withBase / 2
           if difference.positive?
-            return self.cotermianlInTurn self.class.turnPreviousTo(turn), withBase: withBase
+            return self.coterminalInTurn Angle::turnPreviousTo(turn), withBase: withBase
           else
-            return self.coterminalInTurn self.class.turnFollowing(turn), withBase: withBase
+            return self.coterminalInTurn Angle::turnFollowing(turn), withBase: withBase
           end
         else
           return same_turn

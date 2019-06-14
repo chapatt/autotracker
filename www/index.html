@@ -272,9 +272,6 @@
   <link rel="stylesheet" type="text/css" href="./chapatt-webtk/example.css" />
   <script type="text/javascript" src="./chapatt-webtk/chapatt-webtk.js"></script>
 
-  <script type="text/javascript" src="./jquery.min.js"></script>
-  <script type="text/javascript" src="./masonry.pkgd.min.js"></script>
-
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
         var dropDownList1 = chapatt.DropDownList.new(document.getElementById('drop-down-list-1'), [0, 0, 0]);
@@ -309,11 +306,8 @@
 
         function bearingButtonCallback(targetWidget, signalName, signalData, userData) {
             bearingSlider.field.saveFieldText();
-/*
             rotorTargetToBearing(bearingSlider.getValueModel().getValue());
             sendBearing(bearingSlider.getValueModel().getValue());
-*/
-            rotorTargetToBearing(bearingSlider.getValueModel().getValue());
         }
         var bearingButton = chapatt.Button.new(document.getElementById('bearing-button'), 1);
         bearingButton.signalConnect('clicked', bearingButtonCallback, null);
@@ -453,7 +447,10 @@
     };
 
     function sendBearing(bearing) {
-        ws.send(bearing); 
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', 'http://' + window.location.hostname + ':' + window.location.port + '/api/rel-bearing', true);
+        xhr.setRequestHeader('Content-type', 'text/plain; charset=utf-8');
+        xhr.send(bearing);
     }
 
     function rotorTargetToBearing(bearing) {

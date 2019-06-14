@@ -20,11 +20,9 @@ class DCRotor < Rotor
     target = target_rel_bearing.coterminalClosestTo @encoder.position
 
     if @encoder.position < target
-      @encoder.direction = :clockwise
       @encoder.call_at(target) { @motor.stop_cw; false }
       @motor.start_cw
     elsif @encoder.position > target
-      @encoder.direction = :counterclockwise
       @encoder.call_at(target) { @motor.stop_ccw; false }
       @motor.start_ccw
     end
