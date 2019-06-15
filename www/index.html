@@ -26,25 +26,33 @@
       unicode-range: U+30-39;
     }
 
-    body {
+    :root {
       --blue: #aae;
       --module-border-width: 0.25rem;
       --module-border-radius: 0.75rem;
-      --rotor-size: 540px;
+      --module-width-percentage: 50%;
+      --module-min-width: 25rem;
+      --body-padding: 1rem;
+      --gutter-width: 1em;
+    }
 
+    body {
       font-family: sans-serif;
-      padding: 0.5rem;
+      padding: var(--body-padding);
       margin: 0;
     }
 
     #modules {
       list-style-type: none;
+      padding: 0;
+      margin: 0;
     }
 
     .module {
-      margin-bottom: 0.5rem;
       box-sizing: border-box;
       float: left;
+      width: calc(var(--module-width-percentage) - var(--gutter-width));
+      min-width: var(--module-min-width);
     }
 
     .module > .move-controls {
@@ -146,16 +154,15 @@
       text-align: center;
     }
 
-    #rotor-module {
-      float: left;
-      display: inline-block;
-    }
-
     #rotor {
-      width: var(--rotor-size);
-      height: var(--rotor-size);
     }
 
+    .gutter-sizer {
+      width: var(--gutter-width);
+    }
+  </style>
+
+  <style type="text/css">
     #rotor text {
       font-family: 'Vollkorn';
       font-feature-settings: 'onum';
@@ -272,8 +279,29 @@
   <link rel="stylesheet" type="text/css" href="./chapatt-webtk/example.css" />
   <script type="text/javascript" src="./chapatt-webtk/chapatt-webtk.js"></script>
 
+  <script type="text/javascript" src="./packery.pkgd.min.js"></script>
+  <script type="text/javascript" src="./draggabilly.pkgd.min.js"></script>
+
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
+        pckry = new Packery('#modules', {
+            itemSelector: '.module',
+            columnWidth: '.module',
+            gutter: '.gutter-sizer'
+        });
+
+        function remToPixels(rem) {    
+            return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+        }
+
+        moduleMinWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--module-min-width'))
+
+        function setModuleWidthFraction() {
+            var widthPercentage = Math.floor(100 * (1 / Math.floor(window.innerWidth / remToPixels(moduleMinWidth))));
+            document.documentElement.style.setProperty('--module-width-percentage', widthPercentage + '%');
+        }
+        window.addEventListener('resize', setModuleWidthFraction);
+
         var dropDownList1 = chapatt.DropDownList.new(document.getElementById('drop-down-list-1'), [0, 0, 0]);
 
         var textBox1 = chapatt.TextBox.new(document.getElementById('text-box-1'));
@@ -376,62 +404,61 @@
             };
         }
 
+        moduleTitleDragDelta = 0;
+        boundHandleModuleTitleDrag = null;
+
+        function handleModuleTitleDrag(beginX, beginY, event) {
+          deltaX = event.clientX - beginX;
+          deltaY = event.clientY - beginY;
+          moduleTitleDragDelta = Math.sqrt(Math.pow(Math.abs(deltaX), 2) + Math.pow(Math.abs(deltaY), 2));
+        };
+
         var modules = Array.from(document.getElementsByClassName('module'));
         modules.forEach(function(module) {
-            var title = module.getElementsByClassName('title')[0];
-            title.addEventListener('click', function() {
-                module.classList.toggle("collapsed");
-/*
-                layoutModules();
-*/
+            var draggie = new Draggabilly(module, {
+                handle: '.title'
             });
+            pckry.bindDraggabillyEvents(draggie);
 
-            var down = module.getElementsByClassName('move-controls')[0].getElementsByClassName('down')[0];
-            down.addEventListener('click', function() {
-                if (module.nextElementSibling)
-                    module.parentNode.insertBefore(module, module.nextElementSibling.nextElementSibling);
-/*
-                    layoutModules();
-*/
-            });
-
-            var up = module.getElementsByClassName('move-controls')[0].getElementsByClassName('up')[0];
-            up.addEventListener('click', function() {
-		if (module.previousElementSibling)
-                    module.parentNode.insertBefore(module, module.previousElementSibling);
-/*
-                    layoutModules();
-*/
-            });
-        });
-
-        var layoutModules = function() {
-            var modules = Array.from(document.getElementsByClassName('module'));
-            var rotorModule = document.getElementById('rotor-module');
-            var rotorRightMargin = document.documentElement.clientWidth - rotorModule.offsetWidth;
-            modules.forEach(function(module) {
-                module.style.width = "auto";
-                var moduleTop;
-                if ((moduleTop = module.getBoundingClientRect().top) < rotorModule.getBoundingClientRect().bottom) {
-                    module.getElementsByClassName('content')[0].style.borderColor = 'red';
-                    var testModuleWidth;
-                    var moduleWidth = module.offsetWidth;
-                    var i = 1;
-                    while (module.offsetWidth < (testModuleWidth = (rotorRightMargin / i))) {
-                        moduleWidth = testModuleWidth;
-                        ++i;
+            var titleElements = module.getElementsByClassName('title');
+            if (titleElements.length > 0) {
+                var title = titleElements[0];
+                draggie.on('pointerDown', function(event) {
+                    mousedownInTitle = true;
+                    boundHandleModuleTitleDrag = handleModuleTitleDrag.bind(this, event.clientX, event.clientY);
+                    draggie.on('dragMove', boundHandleModuleTitleDrag);
+                });
+                draggie.on('pointerUp', function() {
+                    if (mousedownInTitle) {
+                        mousedownInTitle = false;
+                        document.removeEventListener('mousemove', boundHandleModuleTitleDrag);
+                        if (moduleTitleDragDelta < 5) {
+                            module.classList.toggle('collapsed');
+                            pckry.fit(module);
+                        }
+                        moduleTitleDragDelta = 0;
                     }
-                    console.log(moduleWidth);
-                    module.style.boxSizing = 'border-box';
-                    module.style.width = moduleWidth + 'px';
-                } else {
-                    module.getElementsByClassName('content')[0].style.borderColor = 'blue';
-                }
-            });
-        }
-/*
-        layoutModules();
-*/
+                });
+            }
+
+            var controlsElements = module.getElementsByClassName('move-controls');
+            if (controlsElements.length > 0) {
+                var down = controlsElements[0].getElementsByClassName('down')[0];
+                down.addEventListener('click', function() {
+                    var position = draggie.position;
+                    if (module.nextElementSibling)
+                        module.parentNode.insertBefore(module, module.nextElementSibling.nextElementSibling);
+                        pckry.shiftLayout();
+                });
+
+                var up = controlsElements[0].getElementsByClassName('up')[0];
+                up.addEventListener('click', function() {
+                    if (module.previousElementSibling)
+                        module.parentNode.insertBefore(module, module.previousElementSibling);
+                    pckry.shiftLayout();
+                });
+            }
+        });
     });
 
     Number.prototype.coterminalInTurn = function(turn, base=360) {
@@ -529,14 +556,14 @@
 </head>
 <body>
   <ol id="modules">
-    <li id="rotor-module">
+    <div class="gutter-sizer"></div>
+    <li class="module">
       <svg
         id="rotor"
         xmlns="http://www.w3.org/2000/svg"
         xmlns:svg="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink"
-        width="540"
-        height="540"
+        viewBox="0 0 540 540"
       >
         <defs>
           <!-- start node x = (55 * cos(pi * 0.34)) = 26.49645 -->
