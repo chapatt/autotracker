@@ -55,6 +55,7 @@ module GPIO
     end
   end
   
+  # return false to stop watching
   def self.watch pin, on:
     # on should be 'none', 'rising', 'falling', or 'both'
     File.binwrite "/sys/class/gpio/gpio#{pin}/edge", on
@@ -75,7 +76,7 @@ module GPIO
       fd.seek 0, IO::SEEK_SET
       epoll.wait(max_events=1) { }
   
-      unless (yield fd.read.chomp)
+      unless (yield fd.read.chomp.to_i)
         return
       end
     end
@@ -86,7 +87,7 @@ module GPIO
   end
   
   def self.read_state pin
-    File.binread "/sys/class/gpio/gpio#{pin}/value"
+    File.binread("/sys/class/gpio/gpio#{pin}/value").to_i
   end
   
   def self.cleanup pin

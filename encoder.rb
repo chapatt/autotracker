@@ -9,7 +9,7 @@ class Encoder
   CYCLES_PER_REV = 360
 
   DIR_CW =  1
-  DIR_CCW = 1
+  DIR_CCW = 0
 
   attr_accessor :position,
                 :direction
@@ -22,6 +22,8 @@ class Encoder
     GPIO::setup PIN_ENC, GPIO::TYPE_GPIO, { :direction => GPIO::DIRECTION_INPUT }
     GPIO::setup PIN_DIR, GPIO::TYPE_GPIO, { :direction => GPIO::DIRECTION_INPUT }
 
+    @direction = GPIO::read_state PIN_DIR
+
     self.watch
 
     ObjectSpace.define_finalizer self, proc {
@@ -29,11 +31,8 @@ class Encoder
           @enc_poll_thread.exit
         end
         GPIO::cleanup PIN_ENC
+        GPIO::cleanup PIN_DIR
     }
-  end
-
-  def self.direction
-      GPIO::read_state PIN_DIR
   end
 
   # Block should return false to delete callback
@@ -64,8 +63,9 @@ class Encoder
     end
 
     @dir_poll_thread = Thread.new do
-      GPIO::watch PIN_DIR, on: GPIO::EDGE_BOTH do
-        @direction = GPIO::read PIN_DIR
+      GPIO::watch PIN_DIR, on: GPIO::EDGE_BOTH do |state|
+        @direction = state
+        true
       end
     end
 
