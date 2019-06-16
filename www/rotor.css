@@ -1,0 +1,111 @@
+#rotor text {
+  font-family: 'Vollkorn';
+  font-feature-settings: 'onum';
+  font-variant-numeric: oldstyle-nums;
+  font-variant-alternates: styleset(boring-one);
+}
+
+#circle {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 10;
+}
+
+#arrow-target {
+  transition: transform 0.5s;
+}
+
+#arrow-target path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 5;
+  stroke-dasharray: 10;
+}
+
+#arrow-target text {
+  fill: var(--blue);
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.coordinates {
+  letter-spacing: 0.1em;
+  font-size: 15px;
+  font-weight: 400;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+#target-coordinates {
+  fill: var(--blue);
+}
+
+#rotor-coordinates {
+  fill: black;
+}
+
+#arrow {
+  transition: transform 0.5s;
+  transition-timing-function: linear;
+}
+
+#arrow path {
+  fill: black;
+}
+
+#arrow text {
+  fill: #ffffff;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.limit {
+  transition: transform 1s;
+}
+
+.symbol:hover ~ .box, .symbol:hover ~ text {
+  visibility: visible;
+}
+
+.limit text {
+  fill: white;
+  font-weight: bold;
+  font-size: 20px;
+  visibility: hidden;
+}
+
+.limit .box {
+  visibility: hidden;
+}
+
+#negative-limit .symbol {
+  fill: #a55;
+}
+
+#negative-limit.active .symbol {
+  fill: #f00;
+  filter: url(#glow);
+}
+
+#positive-limit .symbol {
+  fill: #5a5;
+}
+
+#positive-limit.active .symbol {
+  fill: #0f0;
+  filter: url(#glow);
+}
+
+#negative-limit .box {
+  fill: var(--blue);
+}
+
+#positive-limit .box {
+  fill: var(--blue);
+}
+
+#n {
+  transition: transform 0.5s;
+
+  fill: black;
+}
